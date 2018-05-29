@@ -19,9 +19,9 @@ public class EventListenerHandlers {
 
     private static final AtomicInteger sequencer = new AtomicInteger(1000);
 
-    // 全局处理器ID:处理器映射集合
-    private final Map<Integer/*LISTENER_ID*/, EventListener> globalEventListenerMap
-            = new ConcurrentHashMap<Integer, EventListener>();
+    // listenerID:事件监听器
+    private final Map<Integer, EventListener> globalEventListenerMap
+            = new ConcurrentHashMap<>();
 
     private final EventBuffer eventPool = new EventBuffer();
 
@@ -79,7 +79,6 @@ public class EventListenerHandlers {
                         listenerId, event.type
                 );
             }
-
         }
         catch (Throwable throwable) {
             logger.error("", throwable);
@@ -98,14 +97,15 @@ public class EventListenerHandlers {
         // 获取事件处理器
         final EventListener listener = globalEventListenerMap.get(listenerId);
 
-        // 如果尚未注册,则直接返回,不做任何处理
+        // TODO 事件被取消，不再使用增强后的类
         if (null == listener) {
-            logger.debug("listener was not active yet, ignore this process. id={};", listenerId);
+            logger.debug("listener was frozen, ignore this process. id={};", listenerId);
             return;
         }
 
 
         final BeforeEvent event = (BeforeEvent) eventPool.borrowBeforeEvent(
+                //TODO 暂且设置成当前线程上下问classloader
                 Thread.currentThread().getContextClassLoader(),
                 javaClassName,
                 javaMethodName,
@@ -121,15 +121,8 @@ public class EventListenerHandlers {
     }
 
     private void handleOnEnd(final int listenerId,
-                                final Object object,
-                                final boolean isReturn) throws Throwable {
-
+                                final Object object) throws Throwable {
         final EventListener listener = globalEventListenerMap.get(listenerId);
-
-
-//        final Event event = isReturn
-//                ? eventPool.borrowReturnEvent(object)
-//                : eventPool.borrowThrowsEvent(object);
 
         final Event event = eventPool.borrowReturnEvent(object);
 
@@ -141,7 +134,6 @@ public class EventListenerHandlers {
 
     }
 
-
     // ----------------------------------- 从这里开始就是提供给Spy的static方法 -----------------------------------
 
     private EventListenerHandlers(){}
@@ -151,7 +143,6 @@ public class EventListenerHandlers {
     public static EventListenerHandlers getSingleton() {
         return singleton;
     }
-
 
     public static void onBefore(final int listenerId,
                                   final String javaClassName,
@@ -170,13 +161,7 @@ public class EventListenerHandlers {
     }
 
     public static void onReturn(final int listenerId, final Object object) throws Throwable {
-        singleton.handleOnEnd(listenerId, object, true);
+        singleton.handleOnEnd(listenerId, object);
     }
-
-    public static void onThrows(final int listenerId,
-                                  final Throwable throwable) throws Throwable {
-        singleton.handleOnEnd(listenerId, throwable, false);
-    }
-
 
 }

@@ -40,29 +40,6 @@ public class Event {
          */
         RETURN,
 
-        /**
-         * 调用:THROWS
-         */
-        THROWS,
-
-
-        //
-        // CALL事件系列是从GREYS中衍生过来的事件，它描述了一个方法内部，调用其他方法的过程。整个过程可以被描述成为三个阶段
-        //
-        // void test() {
-        //     # CALL_BEFORE
-        //     try {
-        //         logger.info("TEST");
-        //         # CALL_RETURN
-        //     } catch(Throwable cause) {
-        //         # CALL_THROWS
-        //     }
-        // }
-        //
-
-
-
-
     }
 
     public enum TypeStatus {

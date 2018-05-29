@@ -1,10 +1,13 @@
 package com.github.aop;
 
 import com.github.aop.listener.EventListener;
+import com.github.aop.listener.EventListenerHandlers;
 import com.github.aop.weave.IWeaveManager;
 import com.github.aop.weave.WeaveManager;
 
 public class AOP {
+
+    private final EventListenerHandlers listenerHandlers = EventListenerHandlers.getSingleton();
 
     private Class targetClass;
     private String targetMethodName;

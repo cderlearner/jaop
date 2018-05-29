@@ -4,12 +4,12 @@ import com.github.aop.event.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+/**
+ * 事件缓存
+ */
 public class EventBuffer {
 
-
     private RingBuffer ringBuffer = new RingBuffer(1024);
-
 
     public EventBuffer() {
 
@@ -61,19 +61,6 @@ public class EventBuffer {
             return returnEvent;
         }
     }
-
-//    public Event borrowThrowsEvent(final Object object) {
-//        Event event = ringBuffer.borrowEvent();
-//        if(event instanceof ThrowsEvent) {
-//            ThrowsEvent throwsEvent = (ThrowsEvent) event;
-//            throwsEvent.throwable = (Throwable) object;
-//            return event;
-//        } else {
-//            ThrowsEvent throwsEvent = new ThrowsEvent((Throwable) object);
-//            ringBuffer.coverEvent(throwsEvent);
-//            return throwsEvent;
-//        }
-//    }
 
 
     public void returnEvent(Event event) {

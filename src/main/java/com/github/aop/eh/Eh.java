@@ -10,9 +10,12 @@ import org.objectweb.asm.Type;
 import java.lang.reflect.Method;
 import java.util.*;
 
+/**
+ * 代码增强器 生产子类
+ */
 public class Eh {
     private static final Type FACTORY =
-            TypeUtils.parseType("com.xing.cglib.cgtest.CgFactory");
+            TypeUtils.parseType("com.github.aop.eh.CgFactory");
 
     private static final Signature SINGLE_NEW_INSTANCE =
             new Signature("newInstance", Constants.TYPE_OBJECT, new Type[0]);
@@ -41,12 +44,6 @@ public class Eh {
     public void setInterfaces(Class[] interfaces) {
         this.interfaces = interfaces;
     }
-
-    private Signature rename(Signature sig, int index) {
-        return new Signature("LJX" + sig.getName() + "$" + index,
-                sig.getDescriptor());
-    }
-
 
     public static void getMethods(Class superclass, Class[] interfaces, List methods)
     {
@@ -83,9 +80,6 @@ public class Eh {
             throw new IllegalArgumentException("Cannot subclass final class " + sc.getName());
         List constructors = new ArrayList(Arrays.asList(sc.getDeclaredConstructors()));
 
-        // Order is very important: must add superclass, then
-        // its superclass chain, then each interface and
-        // its superinterfaces.
         List actualMethods = new ArrayList();
         List interfaceMethods = new ArrayList();
         final Set forcePublic = new HashSet();
@@ -148,25 +142,7 @@ public class Eh {
         }
     }
 
-//    private void emitDefaultConstructor(ClassEmitter ce) {
-//        Constructor<Object> declaredConstructor;
-//        try {
-//            declaredConstructor = Object.class.getDeclaredConstructor();
-//        } catch (NoSuchMethodException e) {
-//            throw new IllegalStateException("Object should have default constructor ", e);
-//        }
-//        MethodInfo constructor = (MethodInfo) MethodInfoTransformer.getInstance().transform(declaredConstructor);
-//        CodeEmitter e = EmitUtils.begin_method(ce, constructor, Constants.ACC_PUBLIC);
-//        e.load_this();
-//        e.dup();
-//        Signature sig = constructor.getSignature();
-//        e.super_invoke_constructor(sig);
-//        e.return_value();
-//        e.end_method();
-//    }
-
     private Type getThisType(CodeEmitter e) {
-        //return Type.getType("Lcom.xing.cglib.cgtest.TestExProxy;");
         return newType;
     }
 

@@ -71,12 +71,13 @@ public class WeaveManager implements IWeaveManager{
     }
 
     protected ClassLoader newClassLoader(Class clazz) {
-        return new TestClassLoader(clazz.getClassLoader());
+        return new ProxyClassLoader(clazz.getClassLoader());
     }
 
 
     @Override
     public Class weave(Class targetClass, Filter filter, String targetMethodName, EventListener eventListener) throws Throwable {
+        //TODO
         return null;
     }
 
@@ -112,15 +113,12 @@ public class WeaveManager implements IWeaveManager{
 
         byte[] data = enhancer.toByteCodeArray(loader, srcByteCodeArray);
 
-        FileOutputStream fos = new FileOutputStream("E:\\ljx\\asm\\LJX$$HHH.class");
-        fos.write(data);
-        fos.close();
-
         return ReflectUtils.defineClass(loader, targetClass.getName(), data);
     }
 
     @Override
     public Class weave(Class targetClass, List<String> targetMethodNames, EventListener eventListener) throws Throwable {
+        //TODO
         return null;
     }
 
@@ -130,8 +128,8 @@ public class WeaveManager implements IWeaveManager{
         ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS);
         ClassVisitor cv = new ClassVisitor(Opcodes.ASM5, cw) {
             @Override
-            public void visit(int i, int i1, String s, String s1, String s2, String[] strings) {
-                super.visit(i, i1, s, s1, s2, strings);
+            public void visit(int version, int access, String className, String signature, String superClass, String[] interfaces) {
+                super.visit(version, access, className, signature, superClass, interfaces);
             }
         };
         Eh eh = new Eh();
@@ -148,5 +146,7 @@ public class WeaveManager implements IWeaveManager{
             IOUtils.closeQuietly(is);
         }
     }
+
+
 
 }

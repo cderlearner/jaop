@@ -35,8 +35,6 @@ public class MethodWriter extends ClassVisitor implements Opcodes {
 
     @Override
     public void visit(int version, int access, String className, String signature, String superClass, String[] interfaces) {
-        //className = className + "Proxy";
-        //superClass = "com/xing/jvmsandbox/weave/test/Computer";
         super.visit(version, access, className, signature, superClass, interfaces);
     }
 

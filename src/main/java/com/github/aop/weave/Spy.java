@@ -2,16 +2,12 @@ package com.github.aop.weave;
 
 import java.lang.reflect.Method;
 
-/**
- * 间谍类
- */
 public class Spy {
 
     private static volatile Method ON_BEFORE_METHOD;
     private static volatile Method ON_RETURN_METHOD;
 
     /**
-     * 初始化间谍
      * @param ON_BEFORE_METHOD ON_BEFORE 回调
      * @param ON_RETURN_METHOD ON_RETURN 回调
      */

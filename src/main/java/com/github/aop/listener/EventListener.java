@@ -8,5 +8,4 @@ import com.github.aop.event.Event;
 public interface EventListener {
 
     void onEvent(Event event) throws Throwable;
-
 }

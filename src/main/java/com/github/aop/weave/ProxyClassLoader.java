@@ -1,8 +1,8 @@
 package com.github.aop.weave;
 
-public class TestClassLoader extends ClassLoader {
+public class ProxyClassLoader extends ClassLoader {
 
-    public TestClassLoader(ClassLoader parent) {
+    public ProxyClassLoader(ClassLoader parent) {
         super(parent);
     }
 

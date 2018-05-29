@@ -16,9 +16,6 @@ public interface AsmMethods {
         }
     }
 
-    /**
-     * asm method of {@link Spy#spyMethodOnBefore (Object[], int, int, String, String, String, Object)}
-     */
     Method ASM_METHOD_Spy$spyMethodOnBefore = InnerHelper.getAsmMethod(
             Spy.class,
             "spyMethodOnBefore",
@@ -30,9 +27,6 @@ public interface AsmMethods {
             Object.class
     );
 
-    /**
-     * asm method of {@link Spy#spyMethodOnReturn(Object, int)}
-     */
     Method ASM_METHOD_Spy$spyMethodOnReturn = InnerHelper.getAsmMethod(
             Spy.class,
             "spyMethodOnReturn",

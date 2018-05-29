@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration>
+    <appender name="DEBUG_OUT"
+              class="ch.qos.logback.core.ConsoleAppender" target="System.out">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss.SSS} %thread-[%file:%line]->%msg%n</pattern>
+        </layout>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <target>System.out</target>
+    </appender>
+
+    <appender name="INFO_OUT"
+              class="ch.qos.logback.core.ConsoleAppender" target="System.out">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss.SSS} %thread-[%file:%line]->%msg%n</pattern>
+        </layout>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <target>System.out</target>
+    </appender>
+
+    <appender name="ERR"
+              class="ch.qos.logback.core.ConsoleAppender" target="System.err">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss.SSS} %thread-[%file:%line]->%msg%n</pattern>
+        </layout>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <target>System.err</target>
+    </appender>
+
+    <root>
+        <level value="error" />
+        <appender-ref ref="ERR" />
+    </root>
+
+    <root>
+        <level value="info" />
+        <appender-ref ref="INFO_OUT" />
+    </root>
+
+    <root>
+        <level value="debug" />
+        <appender-ref ref="DEBUG_OUT" />
+    </root>
+
+
+</configuration>
