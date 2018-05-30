@@ -1,8 +1,13 @@
 package com.github.aop.weave;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Method;
 
 public class Spy {
+
+    private static final Logger logger = LoggerFactory.getLogger(Spy.class);
 
     private static volatile Method ON_BEFORE_METHOD;
     private static volatile Method ON_RETURN_METHOD;
@@ -28,7 +33,7 @@ public class Spy {
                     javaClassName, javaMethodName, javaMethodDesc, target, argumentArray);
 
         }catch (Throwable ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
         }
     }
 
@@ -38,7 +43,7 @@ public class Spy {
             ON_RETURN_METHOD.invoke(null, listenerId, object);
 
         }catch (Throwable ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
         }
     }
 
