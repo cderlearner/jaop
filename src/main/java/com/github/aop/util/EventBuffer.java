@@ -92,7 +92,7 @@ public class EventBuffer {
             }
 
             if(event.defaultStatus.equals(Event.TypeStatus.USING)) {
-                throw new IllegalStateException("缓存满了，正在使用中");
+                throw new IllegalStateException("什么情况，轮了一圈还在使用？");
             }
 
             event.defaultStatus = Event.TypeStatus.USING;

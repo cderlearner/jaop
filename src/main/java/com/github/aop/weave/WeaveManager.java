@@ -5,7 +5,7 @@ import com.github.aop.filter.Filter;
 import com.github.aop.listener.EventListener;
 import com.github.aop.listener.EventListenerHandlers;
 import com.github.aop.util.ReflectUtils;
-import com.github.aop.util.SandboxStringUtils;
+import com.github.aop.util.AopUtils;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -139,7 +139,7 @@ public class WeaveManager implements IWeaveManager{
     }
 
     private byte[] toByteArray(final Class<?> targetClass) throws IOException {
-        final InputStream is = targetClass.getResourceAsStream("/" + SandboxStringUtils.toInternalClassName(targetClass.getName()).concat(".class"));
+        final InputStream is = targetClass.getResourceAsStream("/" + AopUtils.toInternalClassName(targetClass.getName()).concat(".class"));
         try {
             return IOUtils.toByteArray(is);
         } finally {

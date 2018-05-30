@@ -1,12 +1,12 @@
 package com.github.aop.weave;
 
 import com.github.aop.filter.Filter;
-import com.github.aop.util.SandboxStringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.github.aop.util.AopUtils;
 
 public class MethodWriter extends ClassVisitor implements Opcodes {
 
@@ -20,7 +20,7 @@ public class MethodWriter extends ClassVisitor implements Opcodes {
         this.listenerId = listenerId;
         this.targetClassInternalName = targetClassInternalName;
         this.targetClassAsmType = Type.getObjectType(targetClassInternalName);
-        this.targetJavaClassName = SandboxStringUtils.toJavaClassName(targetClassInternalName);
+        this.targetJavaClassName = AopUtils.toJavaClassName(targetClassInternalName);
         this.filter = filter;
     }
 
@@ -184,7 +184,7 @@ public class MethodWriter extends ClassVisitor implements Opcodes {
      */
     private boolean isIgnore(MethodVisitor mv, int access, String name, String desc, String[] exceptions) {
         return null == mv
-                || !filter.doMethodFilter(access, name, SandboxStringUtils.toJavaClassNameArray(getParameterTypeArray(desc)), SandboxStringUtils.toJavaClassNameArray(exceptions));
+                || !filter.doMethodFilter(access, name, AopUtils.toJavaClassNameArray(getParameterTypeArray(desc)), AopUtils.toJavaClassNameArray(exceptions));
     }
 
     /**

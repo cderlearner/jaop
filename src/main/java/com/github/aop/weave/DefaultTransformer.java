@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import com.github.aop.filter.Filter;
 import com.github.aop.util.*;
-import static com.github.aop.util.SandboxStringUtils.toJavaClassName;
-import static com.github.aop.util.SandboxStringUtils.toJavaClassNameArray;
+import static com.github.aop.util.AopUtils.toJavaClassName;
+import static com.github.aop.util.AopUtils.toJavaClassNameArray;
 
 import static org.objectweb.asm.ClassReader.EXPAND_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
@@ -101,7 +101,7 @@ public class DefaultTransformer implements Transformer{
                     do {
                         c = c.getSuperclass();
                     } while (!c.isAssignableFrom(d));
-                    return SandboxStringUtils.toInternalClassName(c.getName());
+                    return AopUtils.toInternalClassName(c.getName());
                 }
             }
 
