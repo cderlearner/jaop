@@ -11,8 +11,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -62,10 +60,6 @@ public class WeaveManager implements IWeaveManager{
         );
 
         byte[] data = enhancer.toByteCodeArray(loader, srcByteCodeArray);
-
-        FileOutputStream fos = new FileOutputStream("E:\\ljx\\asm\\LJX$$HHH.class");
-        fos.write(data);
-        fos.close();
 
         return ReflectUtils.defineClass(loader, targetClass.getName(), data);
     }

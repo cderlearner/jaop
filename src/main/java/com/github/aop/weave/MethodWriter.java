@@ -1,6 +1,7 @@
 package com.github.aop.weave;
 
 import com.github.aop.filter.Filter;
+import com.github.aop.listener.EventListenerHandlers;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
@@ -51,6 +52,7 @@ public class MethodWriter extends ClassVisitor implements Opcodes {
             return mv;
         }
 
+        EventListenerHandlers.getSingleton().setClassMethodToListenerId(targetClassInternalName+name+desc, listenerId);
         logger.debug("{}.{} was matched, prepare to rewrite, listener-id={}", targetClassAsmType, name, listenerId);
 
 

@@ -23,12 +23,20 @@ public class EventListenerHandlers {
     private final Map<Integer, EventListener> globalEventListenerMap
             = new ConcurrentHashMap<>();
 
+    //TODO 暂时缓存起来
+    //Key = className+methodName+methodDesc
+    private final Map<String, Integer> classMethodToListenerIdMap = new ConcurrentHashMap<>();
+
     private final EventBuffer eventPool = new EventBuffer();
 
     public int createAndActiveListenerId(EventListener eventListener) {
         int listenerId = sequencer.getAndIncrement();
         active(listenerId, eventListener);
         return listenerId;
+    }
+
+    public void setClassMethodToListenerId(String classMethodkey, int listenerId) {
+        classMethodToListenerIdMap.put(classMethodkey, listenerId);
     }
 
     /**
