@@ -5,7 +5,7 @@ public class Event {
 
     public volatile int eventId = -1;
 
-    public volatile TypeStatus defaultStatus = TypeStatus.INIT;
+    public volatile TypeStatus typeStatus = TypeStatus.INIT;
 
     /**
      * 事件类型
@@ -23,6 +23,11 @@ public class Event {
 
     public Event() {
 
+    }
+
+    protected void updateState(int eventIdId, TypeStatus typeStatus) {
+        this.eventId = eventIdId;
+        this.typeStatus = typeStatus;
     }
 
     /**

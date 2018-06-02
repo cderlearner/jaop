@@ -36,9 +36,9 @@ public class EventBuffer {
                     target,
                     argumentArray
             );
-
-            beforeEvent.defaultStatus = event.defaultStatus;
-            beforeEvent.eventId = event.eventId;
+            //更新状态
+            beforeEvent.updateState(event.eventId, event.typeStatus);
+            //覆盖缓存
             ringBuffer.coverEvent(beforeEvent);
             return beforeEvent;
         }
@@ -52,8 +52,9 @@ public class EventBuffer {
             return event;
         } else {
             ReturnEvent returnEvent = new ReturnEvent(object);
-            returnEvent.defaultStatus = event.defaultStatus;
-            returnEvent.eventId = event.eventId;
+
+            returnEvent.updateState(event.eventId, event.typeStatus);
+
             ringBuffer.coverEvent(returnEvent);
             return returnEvent;
         }
@@ -86,12 +87,11 @@ public class EventBuffer {
                 events[index] = event;
             }
 
-            if(event.defaultStatus.equals(Event.TypeStatus.USING)) {
+            if(event.typeStatus.equals(Event.TypeStatus.USING)) {
                 throw new IllegalStateException("什么情况，轮了一圈还在使用？");
             }
 
-            event.defaultStatus = Event.TypeStatus.USING;
-            event.eventId = next;
+            updateState(event, Event.TypeStatus.USING, next);
             return event;
         }
 
@@ -99,7 +99,12 @@ public class EventBuffer {
             if(event.eventId == -1) {
                 throw new IllegalStateException("你在干啥");
             }
-            event.defaultStatus = Event.TypeStatus.CAN_USE;
+            updateState(event, Event.TypeStatus.CAN_USE, event.eventId);
+        }
+
+        private void updateState(Event event, Event.TypeStatus typeStatus, int eventId) {
+            event.typeStatus = typeStatus;
+            event.eventId = eventId;
         }
 
         public void coverEvent(Event event) {
