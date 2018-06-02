@@ -36,7 +36,7 @@ public interface IWeaveManager {
      * @return
      * @throws Throwable
      */
-    Class weaveExten(Class targetClass, String targetMethodName,
-                     EventListener eventListener) throws Throwable;
+    Class weaveSubClass(Class targetClass, String targetMethodName,
+                        EventListener eventListener) throws Throwable;
 
 }

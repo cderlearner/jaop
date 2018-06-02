@@ -2,12 +2,12 @@ package com.github.aop.weave;
 
 import com.github.aop.filter.Filter;
 import com.github.aop.listener.EventListenerHandlers;
+import com.github.aop.log.LoggerFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.github.aop.util.AopUtils;
+import com.github.aop.log.api.*;
 
 public class MethodWriter extends ClassVisitor implements Opcodes {
 

@@ -7,7 +7,7 @@ import com.github.aop.weave.WeaveManager;
 
 public class AOP {
 
-    private final EventListenerHandlers listenerHandlers = EventListenerHandlers.getSingleton();
+    public static final EventListenerHandlers listenerHandlers = EventListenerHandlers.getSingleton();
 
     private Class targetClass;
     private String targetMethodName;
@@ -22,7 +22,7 @@ public class AOP {
     private IWeaveManager weaveManager = WeaveManager.getSingleton();
 
     public Object create() throws Throwable{
-       Class clazz =  weaveManager.weaveExten(targetClass, targetMethodName, eventListener);
+       Class clazz =  weaveManager.weaveSubClass(targetClass, targetMethodName, eventListener);
        return clazz.newInstance();
     }
 

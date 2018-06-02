@@ -1,7 +1,8 @@
 package com.github.aop.weave;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.github.aop.log.LoggerFactory;
+import com.github.aop.log.api.*;
 
 import java.lang.reflect.Method;
 

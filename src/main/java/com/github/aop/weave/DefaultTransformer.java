@@ -1,14 +1,13 @@
 package com.github.aop.weave;
 
+import com.github.aop.log.LoggerFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.aop.filter.Filter;
 import com.github.aop.util.*;
+import com.github.aop.log.api.*;
 import static com.github.aop.util.AopUtils.toJavaClassName;
 import static com.github.aop.util.AopUtils.toJavaClassNameArray;
 

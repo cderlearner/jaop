@@ -2,19 +2,27 @@ package com.github.aop.weave;
 
 import com.github.aop.eh.Eh;
 import com.github.aop.filter.Filter;
+import com.github.aop.filter.MethodFilter;
+import com.github.aop.filter.MethodSetFilter;
 import com.github.aop.listener.EventListener;
 import com.github.aop.listener.EventListenerHandlers;
-import com.github.aop.util.ReflectUtils;
 import com.github.aop.util.AopUtils;
+import com.github.aop.util.ReflectUtils;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.HashSet;
 
+/**
+ * 字节码增强管理器
+ * ljx
+ */
 public class WeaveManager implements IWeaveManager{
 
     private final EventListenerHandlers listenerHandlers = EventListenerHandlers.getSingleton();
@@ -30,36 +38,13 @@ public class WeaveManager implements IWeaveManager{
     @Override
     public Class<?> weave(final Class targetClass,
                           final String targetJavaMethodName,
-                          final EventListener listener) throws Throwable{
+                          final EventListener listener) throws Throwable {
 
-        final int listenerId = listenerHandlers.createAndActiveListenerId(listener);
+        Filter methodFilter = new MethodFilter(targetJavaMethodName);
 
         final ClassLoader loader = newClassLoader(targetClass);
 
-        final byte[] srcByteCodeArray = toByteArray(targetClass);
-
-        final Transformer enhancer = new DefaultTransformer(
-                new Filter() {
-                    @Override
-                    public boolean doClassFilter(final int access,
-                                                 final String javaClassName,
-                                                 final String superClassTypeJavaClassName,
-                                                 final String[] interfaceTypeJavaClassNameArray) {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean doMethodFilter(final int access,
-                                                  final String javaMethodName,
-                                                  final String[] parameterTypeJavaClassNameArray,
-                                                  final String[] throwsTypeJavaClassNameArray) {
-                        return javaMethodName.equals(targetJavaMethodName);
-                    }
-                },
-                listenerId
-        );
-
-        byte[] data = enhancer.toByteCodeArray(loader, srcByteCodeArray);
+        byte[] data = transform(targetClass, loader, listener, methodFilter);
 
         return ReflectUtils.defineClass(loader, targetClass.getName(), data);
     }
@@ -71,12 +56,28 @@ public class WeaveManager implements IWeaveManager{
 
     @Override
     public Class weave(Class targetClass, Filter filter, String targetMethodName, EventListener eventListener) throws Throwable {
-        //TODO
-        return null;
+
+        final ClassLoader loader = newClassLoader(targetClass);
+
+        byte[] data = transform(targetClass, loader, eventListener, filter);
+
+        return ReflectUtils.defineClass(loader, targetClass.getName(), data);
     }
 
     @Override
-    public Class weaveExten(Class targetClass, String targetMethodName, EventListener eventListener) throws Throwable {
+    public Class weave(Class targetClass, List<String> targetMethodNames, EventListener eventListener) throws Throwable {
+
+        MethodSetFilter methodSetFilter = new MethodSetFilter(new HashSet<>(targetMethodNames));
+
+        final ClassLoader loader = newClassLoader(targetClass);
+
+        byte[] data = transform(targetClass, loader, eventListener, methodSetFilter);
+
+        return ReflectUtils.defineClass(loader, targetClass.getName(), data);
+    }
+
+    @Override
+    public Class weaveSubClass(Class targetClass, String targetMethodName, EventListener eventListener) throws Throwable {
 
         final byte[] srcByteCodeArray = enhancer(targetClass);
 
@@ -84,36 +85,30 @@ public class WeaveManager implements IWeaveManager{
 
         final ClassLoader loader = newClassLoader(targetClass);
 
-        final Transformer enhancer = new DefaultTransformer(
-                new Filter() {
-                    @Override
-                    public boolean doClassFilter(final int access,
-                                                 final String javaClassName,
-                                                 final String superClassTypeJavaClassName,
-                                                 final String[] interfaceTypeJavaClassNameArray) {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean doMethodFilter(final int access,
-                                                  final String javaMethodName,
-                                                  final String[] parameterTypeJavaClassNameArray,
-                                                  final String[] throwsTypeJavaClassNameArray) {
-                        return javaMethodName.equals(targetMethodName);
-                    }
-                },
+        final Transformer transformer = new DefaultTransformer(
+                new MethodFilter(targetMethodName),
                 listenerId
         );
 
-        byte[] data = enhancer.toByteCodeArray(loader, srcByteCodeArray);
+        byte[] data = transformer.toByteCodeArray(loader, srcByteCodeArray);
 
         return ReflectUtils.defineClass(loader, targetClass.getName(), data);
     }
 
-    @Override
-    public Class weave(Class targetClass, List<String> targetMethodNames, EventListener eventListener) throws Throwable {
-        //TODO
-        return null;
+    private byte[] transform(Class targetClass,
+                             ClassLoader loader,
+                             EventListener listener,
+                             Filter filter) throws Throwable{
+
+        final int listenerId = listenerHandlers.createAndActiveListenerId(listener);
+
+        final byte[] srcByteCodeArray = toByteArray(targetClass);
+
+        final Transformer transformer = new DefaultTransformer(
+                filter,
+                listenerId
+        );
+        return transformer.toByteCodeArray(loader, srcByteCodeArray);
     }
 
     private byte[] enhancer(Class targetClass) throws Throwable{

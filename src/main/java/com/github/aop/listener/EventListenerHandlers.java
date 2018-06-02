@@ -2,10 +2,9 @@ package com.github.aop.listener;
 
 import com.github.aop.event.BeforeEvent;
 import com.github.aop.event.Event;
-import com.github.aop.util.EventBuffer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.github.aop.event.EventBuffer;
+import com.github.aop.log.LoggerFactory;
+import com.github.aop.log.api.Logger;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -79,7 +78,6 @@ public class EventListenerHandlers {
                                 final EventListener listener) throws Throwable {
 
         try {
-
             // 调用事件处理
             listener.onEvent(event);
             if (logger.isDebugEnabled()) {

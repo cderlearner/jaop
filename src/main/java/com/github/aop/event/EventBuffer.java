@@ -1,6 +1,4 @@
-package com.github.aop.util;
-
-import com.github.aop.event.*;
+package com.github.aop.event;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,7 +10,6 @@ public class EventBuffer {
     private RingBuffer ringBuffer = new RingBuffer(1024);
 
     public EventBuffer() {
-
     }
 
     public Event borrowBeforeEvent(final ClassLoader javaClassLoader,
@@ -62,11 +59,9 @@ public class EventBuffer {
         }
     }
 
-
     public void returnEvent(Event event) {
         ringBuffer.returnEvent(event);
     }
-
 
     public static class RingBuffer {
 
