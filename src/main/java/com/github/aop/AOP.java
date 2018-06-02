@@ -4,6 +4,7 @@ import com.github.aop.listener.EventListener;
 import com.github.aop.listener.EventListenerHandlers;
 import com.github.aop.weave.IWeaveManager;
 import com.github.aop.weave.WeaveManager;
+import org.omg.CORBA.ObjectHelper;
 
 public class AOP {
 
@@ -21,11 +22,21 @@ public class AOP {
 
     private IWeaveManager weaveManager = WeaveManager.getSingleton();
 
-    public Object create() throws Throwable{
-       Class clazz =  weaveManager.weaveSubClass(targetClass, targetMethodName, eventListener);
-       return clazz.newInstance();
+    //只能反射调用
+    public Class createReflectClass() throws Throwable{
+       Class clazz =  weaveManager.weave(targetClass, targetMethodName, eventListener);
+       return clazz;
     }
 
+    public Class createCgFactory() throws Throwable {
+        Class clazz = weaveManager.weaveSubClass(targetClass, targetMethodName, eventListener);
+        return clazz;
+    }
+
+    public Object createIntance() throws Throwable {
+        Class clazz = weaveManager.weaveSubClass(targetClass, targetMethodName, eventListener);
+        return clazz.newInstance();
+    }
 
     public static class Builder {
         private Class targetClass;

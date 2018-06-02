@@ -47,7 +47,7 @@ public class Computer {
             })
             .build();
     
-    Computer computer = (Computer) aop.create();
+    Computer computer = (Computer) aop.createIntance();
     
     System.err.println(computer.sum(new int[]{1,1}));
 

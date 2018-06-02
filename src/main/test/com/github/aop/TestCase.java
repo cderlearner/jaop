@@ -1,5 +1,6 @@
 package com.github.aop;
 
+import com.github.aop.eh.CgFactory;
 import com.github.aop.event.BeforeEvent;
 import com.github.aop.event.Event;
 import com.github.aop.event.ReturnEvent;
@@ -39,7 +40,10 @@ public class TestCase {
                 })
                 .build();
 
-        Computer computer = (Computer) aop.create();
+//        Class clazz = aop.createCgFactory();
+//        CgFactory cgFactory = (CgFactory) clazz.newInstance();
+//        Computer computer = (Computer) cgFactory.newInstance();
+        Computer computer = (Computer) aop.createIntance();
 
         System.err.println(computer.sum(new int[]{1,1}));
 
