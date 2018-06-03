@@ -1,10 +1,11 @@
 package com.github.aop;
 
+import com.github.aop.exception.AOPException;
 import com.github.aop.listener.EventListener;
 import com.github.aop.listener.EventListenerHandlers;
+import com.github.aop.util.Assert;
 import com.github.aop.weave.IWeaveManager;
 import com.github.aop.weave.WeaveManager;
-import org.omg.CORBA.ObjectHelper;
 
 public class AOP {
 
@@ -23,17 +24,26 @@ public class AOP {
     private IWeaveManager weaveManager = WeaveManager.getSingleton();
 
     //只能反射调用
-    public Class createReflectClass() throws Throwable{
+    public Class createReflectClass() throws AOPException{
+        Assert.notNull(targetClass, "目标类不能为空");
+        Assert.notNull(eventListener,"aop监听器不能为空");
+        Assert.notBlank(targetMethodName,"目标方法不能为空");
        Class clazz =  weaveManager.weave(targetClass, targetMethodName, eventListener);
        return clazz;
     }
 
     public Class createCgFactory() throws Throwable {
+        Assert.notNull(targetClass, "目标类不能为空");
+        Assert.notNull(eventListener,"aop监听器不能为空");
+        Assert.notBlank(targetMethodName,"目标方法不能为空");
         Class clazz = weaveManager.weaveSubClass(targetClass, targetMethodName, eventListener);
         return clazz;
     }
 
     public Object createIntance() throws Throwable {
+        Assert.notNull(targetClass, "目标类不能为空");
+        Assert.notNull(eventListener,"aop监听器不能为空");
+        Assert.notBlank(targetMethodName,"目标方法不能为空");
         Class clazz = weaveManager.weaveSubClass(targetClass, targetMethodName, eventListener);
         return clazz.newInstance();
     }

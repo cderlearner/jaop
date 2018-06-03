@@ -1,5 +1,6 @@
 package com.github.aop.weave;
 
+import com.github.aop.exception.AOPException;
 import com.github.aop.log.LoggerFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.ClassReader;
@@ -28,7 +29,7 @@ public class DefaultTransformer implements Transformer{
     }
 
     @Override
-    public byte[] toByteCodeArray(ClassLoader targetClassLoader, byte[] srcByteArray) throws Throwable{
+    public byte[] toByteCodeArray(ClassLoader targetClassLoader, byte[] srcByteArray) throws AOPException{
         final ClassReader cr = new ClassReader(srcByteArray);
 
         // 如果目标对象不在类匹配范围,则主动忽略增强

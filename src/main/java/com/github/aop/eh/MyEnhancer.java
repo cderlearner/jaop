@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * 代码增强器 生产子类
  */
-public class Eh {
+public class MyEnhancer {
     private static final Type FACTORY =
             TypeUtils.parseType("com.github.aop.eh.CgFactory");
 

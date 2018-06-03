@@ -1,6 +1,7 @@
 package com.github.aop.weave;
 
-import com.github.aop.eh.Eh;
+import com.github.aop.eh.MyEnhancer;
+import com.github.aop.exception.AOPException;
 import com.github.aop.filter.Filter;
 import com.github.aop.filter.MethodFilter;
 import com.github.aop.filter.MethodSetFilter;
@@ -38,7 +39,7 @@ public class WeaveManager implements IWeaveManager{
     @Override
     public Class<?> weave(final Class targetClass,
                           final String targetJavaMethodName,
-                          final EventListener listener) throws Throwable {
+                          final EventListener listener) throws AOPException {
 
         Filter methodFilter = new MethodFilter(targetJavaMethodName);
 
@@ -55,7 +56,7 @@ public class WeaveManager implements IWeaveManager{
 
 
     @Override
-    public Class weave(Class targetClass, Filter filter, String targetMethodName, EventListener eventListener) throws Throwable {
+    public Class weave(Class targetClass, Filter filter, String targetMethodName, EventListener eventListener) throws AOPException {
 
         final ClassLoader loader = newClassLoader(targetClass);
 
@@ -65,7 +66,7 @@ public class WeaveManager implements IWeaveManager{
     }
 
     @Override
-    public Class weave(Class targetClass, List<String> targetMethodNames, EventListener eventListener) throws Throwable {
+    public Class weave(Class targetClass, List<String> targetMethodNames, EventListener eventListener) throws AOPException {
 
         MethodSetFilter methodSetFilter = new MethodSetFilter(new HashSet<>(targetMethodNames));
 
@@ -77,7 +78,7 @@ public class WeaveManager implements IWeaveManager{
     }
 
     @Override
-    public Class weaveSubClass(Class targetClass, String targetMethodName, EventListener eventListener) throws Throwable {
+    public Class weaveSubClass(Class targetClass, String targetMethodName, EventListener eventListener) throws AOPException {
 
         final byte[] srcByteCodeArray = enhancer(targetClass);
 
@@ -98,7 +99,7 @@ public class WeaveManager implements IWeaveManager{
     private byte[] transform(Class targetClass,
                              ClassLoader loader,
                              EventListener listener,
-                             Filter filter) throws Throwable{
+                             Filter filter) throws AOPException{
 
         final int listenerId = listenerHandlers.createAndActiveListenerId(listener);
 
@@ -111,7 +112,7 @@ public class WeaveManager implements IWeaveManager{
         return transformer.toByteCodeArray(loader, srcByteCodeArray);
     }
 
-    private byte[] enhancer(Class targetClass) throws Throwable{
+    private byte[] enhancer(Class targetClass) throws AOPException{
         byte[] sourceCode = toByteArray(targetClass);
         ClassReader cr = new ClassReader(sourceCode);
         ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS);
@@ -121,16 +122,22 @@ public class WeaveManager implements IWeaveManager{
                 super.visit(version, access, className, signature, superClass, interfaces);
             }
         };
-        Eh eh = new Eh();
+        MyEnhancer eh = new MyEnhancer();
         eh.setSuperclass(targetClass);
-        eh.generateClass(cv);
+        try {
+            eh.generateClass(cv);
+        } catch (Exception e) {
+            throw new AOPException(e);
+        }
         return cw.toByteArray();
     }
 
-    private byte[] toByteArray(final Class<?> targetClass) throws IOException {
+    private byte[] toByteArray(final Class<?> targetClass) throws AOPException{
         final InputStream is = targetClass.getResourceAsStream("/" + AopUtils.toInternalClassName(targetClass.getName()).concat(".class"));
         try {
             return IOUtils.toByteArray(is);
+        } catch (IOException e) {
+            throw new AOPException(e);
         } finally {
             IOUtils.closeQuietly(is);
         }

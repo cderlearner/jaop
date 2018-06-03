@@ -1,5 +1,6 @@
 package com.github.aop.util;
 
+import com.github.aop.exception.AOPException;
 import com.github.aop.exception.UnCaughtException;
 
 import java.lang.reflect.Field;
@@ -96,7 +97,7 @@ public class ReflectUtils {
      */
     public static Class<?> defineClass(final ClassLoader loader,
                                        final String javaClassName,
-                                       final byte[] classByteArray) throws InvocationTargetException, IllegalAccessException {
+                                       final byte[] classByteArray) throws AOPException{
 
         final Method defineClassMethod =
                 unCaughtGetClassDeclaredJavaMethod(ClassLoader.class, "defineClass", String.class, byte[].class, int.class, int.class);
@@ -112,6 +113,10 @@ public class ReflectUtils {
                         0,
                         classByteArray.length
                 );
+            } catch (IllegalAccessException e) {
+                throw new AOPException(e);
+            } catch (InvocationTargetException e) {
+                throw new AOPException(e);
             } finally {
                 defineClassMethod.setAccessible(acc);
             }

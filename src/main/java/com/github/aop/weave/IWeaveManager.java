@@ -1,5 +1,6 @@
 package com.github.aop.weave;
 
+import com.github.aop.exception.AOPException;
 import com.github.aop.filter.Filter;
 import com.github.aop.listener.EventListener;
 
@@ -16,15 +17,15 @@ public interface IWeaveManager {
      * @throws Throwable
      */
     Class weave(Class targetClass, String targetMethodName,
-                EventListener eventListener) throws Throwable;
+                EventListener eventListener) throws AOPException;
 
 
     Class weave(Class targetClass, List<String> targetMethodNames,
-                EventListener eventListener) throws Throwable;
+                EventListener eventListener) throws AOPException;
 
 
     Class weave(Class targetClass, Filter filter, String targetMethodName,
-                EventListener eventListener) throws Throwable;
+                EventListener eventListener) throws AOPException;
 
 
     /**
@@ -37,6 +38,6 @@ public interface IWeaveManager {
      * @throws Throwable
      */
     Class weaveSubClass(Class targetClass, String targetMethodName,
-                        EventListener eventListener) throws Throwable;
+                        EventListener eventListener) throws AOPException;
 
 }
