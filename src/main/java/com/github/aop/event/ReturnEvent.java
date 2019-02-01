@@ -11,7 +11,7 @@ public class ReturnEvent extends InvokeEvent {
     /**
      * 构造调用RETURN事件
      *
-     * @param object    调用返回值(void方法返回值为null)
+     * @param object 调用返回值(void方法返回值为null)
      */
     public ReturnEvent(final Object object) {
         super(Type.RETURN);

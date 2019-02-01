@@ -1,6 +1,6 @@
-package com.github.aop.log;
+package com.github.aop.util.log;
 
-import com.github.aop.log.api.*;
+import com.github.aop.util.log.api.*;
 
 public class LoggerFactory {
     private static LogResolver RESOLVER = new EasyLogResolver();

@@ -2,10 +2,8 @@ package com.github.aop.event;
 
 
 public class Event {
-
-    public volatile int eventId = -1;
-
-    public volatile TypeStatus typeStatus = TypeStatus.INIT;
+    volatile int eventId = -1;
+    volatile TypeStatus typeStatus = TypeStatus.INIT;
 
     /**
      * 事件类型

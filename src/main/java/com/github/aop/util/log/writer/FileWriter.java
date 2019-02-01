@@ -1,12 +1,13 @@
-package com.github.aop.log.writer;
+package com.github.aop.util.log.writer;
 
-import com.lmax.disruptor.EventFactory;
+import com.github.aop.util.log.Config;
+import com.github.aop.util.log.Constants;
+import com.github.aop.util.log.LogMessageHolder;
+import com.github.aop.util.log.api.IWriter;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
-import com.github.aop.log.*;
-import com.github.aop.log.api.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +20,6 @@ import java.util.concurrent.Callable;
 public class FileWriter implements IWriter, EventHandler<LogMessageHolder> {
     private static FileWriter INSTANCE;
     private static final Object CREATE_LOCK = new Object();
-    private Disruptor<LogMessageHolder> disruptor;
     private RingBuffer<LogMessageHolder> buffer;
     private FileOutputStream fileOutputStream;
     private volatile boolean started = false;
@@ -38,12 +38,7 @@ public class FileWriter implements IWriter, EventHandler<LogMessageHolder> {
     }
 
     private FileWriter() {
-        disruptor = new Disruptor<LogMessageHolder>(new EventFactory<LogMessageHolder>() {
-            @Override
-            public LogMessageHolder newInstance() {
-                return new LogMessageHolder();
-            }
-        }, 1024, DaemonThreadFactory.INSTANCE);
+        Disruptor<LogMessageHolder> disruptor = new Disruptor<>(LogMessageHolder::new, 1024, DaemonThreadFactory.INSTANCE);
         disruptor.handleEventsWith(this);
         buffer = disruptor.getRingBuffer();
         lineNum = 0;
@@ -78,36 +73,24 @@ public class FileWriter implements IWriter, EventHandler<LogMessageHolder> {
 
     private void switchFile() {
         if (fileSize > Config.Logging.MAX_FILE_SIZE) {
-            forceExecute(new Callable() {
-                @Override
-                public Object call() throws Exception {
-                    fileOutputStream.flush();
-                    return null;
-                }
+            forceExecute(() -> {
+                fileOutputStream.flush();
+                return null;
             });
-            forceExecute(new Callable() {
-                @Override
-                public Object call() throws Exception {
-                    fileOutputStream.close();
-                    return null;
-                }
+            forceExecute(() -> {
+                fileOutputStream.close();
+                return null;
             });
-            forceExecute(new Callable() {
-                @Override
-                public Object call() throws Exception {
-                    new File(Config.Logging.DIR, Config.Logging.FILE_NAME)
-                        .renameTo(new File(Config.Logging.DIR,
-                            Config.Logging.FILE_NAME + new SimpleDateFormat(".yyyy_MM_dd_HH_mm_ss").format(new Date())));
-                    return null;
-                }
+            forceExecute(() -> {
+                new File(Config.Logging.DIR, Config.Logging.FILE_NAME)
+                    .renameTo(new File(Config.Logging.DIR,
+                        Config.Logging.FILE_NAME + new SimpleDateFormat(".yyyy_MM_dd_HH_mm_ss").format(new Date())));
+                return null;
             });
-            forceExecute(new Callable() {
-                @Override
-                public Object call() throws Exception {
-                    fileOutputStream = null;
-                    started = false;
-                    return null;
-                }
+            forceExecute(() -> {
+                fileOutputStream = null;
+                started = false;
+                return null;
             });
         }
     }

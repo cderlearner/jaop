@@ -13,50 +13,49 @@ import java.util.*;
 
 public class EmitUtils {
     private static final Signature CSTRUCT_NULL =
-      TypeUtils.parseConstructor("");
+            TypeUtils.parseConstructor("");
     private static final Signature CSTRUCT_THROWABLE =
-      TypeUtils.parseConstructor("Throwable");
+            TypeUtils.parseConstructor("Throwable");
 
     private static final Signature GET_NAME =
-      TypeUtils.parseSignature("String getName()");
+            TypeUtils.parseSignature("String getName()");
     private static final Signature HASH_CODE =
-      TypeUtils.parseSignature("int hashCode()");
+            TypeUtils.parseSignature("int hashCode()");
     private static final Signature EQUALS =
-      TypeUtils.parseSignature("boolean equals(Object)");
+            TypeUtils.parseSignature("boolean equals(Object)");
     private static final Signature STRING_LENGTH =
-      TypeUtils.parseSignature("int length()");
+            TypeUtils.parseSignature("int length()");
     private static final Signature STRING_CHAR_AT =
-      TypeUtils.parseSignature("char charAt(int)");
+            TypeUtils.parseSignature("char charAt(int)");
     private static final Signature FOR_NAME =
-      TypeUtils.parseSignature("Class forName(String)");
+            TypeUtils.parseSignature("Class forName(String)");
     private static final Signature DOUBLE_TO_LONG_BITS =
-      TypeUtils.parseSignature("long doubleToLongBits(double)");
+            TypeUtils.parseSignature("long doubleToLongBits(double)");
     private static final Signature FLOAT_TO_INT_BITS =
-      TypeUtils.parseSignature("int floatToIntBits(float)");
+            TypeUtils.parseSignature("int floatToIntBits(float)");
     private static final Signature TO_STRING =
-      TypeUtils.parseSignature("String toString()");
+            TypeUtils.parseSignature("String toString()");
     private static final Signature APPEND_STRING =
-      TypeUtils.parseSignature("StringBuffer append(String)");
+            TypeUtils.parseSignature("StringBuffer append(String)");
     private static final Signature APPEND_INT =
-      TypeUtils.parseSignature("StringBuffer append(int)");
+            TypeUtils.parseSignature("StringBuffer append(int)");
     private static final Signature APPEND_DOUBLE =
-      TypeUtils.parseSignature("StringBuffer append(double)");
+            TypeUtils.parseSignature("StringBuffer append(double)");
     private static final Signature APPEND_FLOAT =
-      TypeUtils.parseSignature("StringBuffer append(float)");
+            TypeUtils.parseSignature("StringBuffer append(float)");
     private static final Signature APPEND_CHAR =
-      TypeUtils.parseSignature("StringBuffer append(char)");
+            TypeUtils.parseSignature("StringBuffer append(char)");
     private static final Signature APPEND_LONG =
-      TypeUtils.parseSignature("StringBuffer append(long)");
+            TypeUtils.parseSignature("StringBuffer append(long)");
     private static final Signature APPEND_BOOLEAN =
-      TypeUtils.parseSignature("StringBuffer append(boolean)");
+            TypeUtils.parseSignature("StringBuffer append(boolean)");
     private static final Signature LENGTH =
-      TypeUtils.parseSignature("int length()");
+            TypeUtils.parseSignature("int length()");
     private static final Signature SET_LENGTH =
-      TypeUtils.parseSignature("void setLength(int)");
+            TypeUtils.parseSignature("void setLength(int)");
     private static final Signature GET_DECLARED_METHOD =
-      TypeUtils.parseSignature("java.lang.reflect.Method getDeclaredMethod(String, Class[])");
-     
-    
+            TypeUtils.parseSignature("java.lang.reflect.Method getDeclaredMethod(String, Class[])");
+
 
     public static final ArrayDelimiters DEFAULT_DELIMITERS = new ArrayDelimiters("{", ", ", "}");
 
@@ -85,7 +84,8 @@ public class EmitUtils {
      * Process an array on the stack. Assumes the top item on the stack
      * is an array of the specified type. For each element in the array,
      * puts the element on the stack and triggers the callback.
-     * @param type the type of the array (type.isArray() must be true)
+     *
+     * @param type     the type of the array (type.isArray() must be true)
      * @param callback the callback triggered for each element
      */
     public static void process_array(CodeEmitter e, Type type, ProcessArrayCallback callback) {
@@ -117,7 +117,8 @@ public class EmitUtils {
      * Process two arrays on the stack in parallel. Assumes the top two items on the stack
      * are arrays of the specified class. The arrays must be the same length. For each pair
      * of elements in the arrays, puts the pair on the stack and triggers the callback.
-     * @param type the type of the arrays (type.isArray() must be true)
+     *
+     * @param type     the type of the arrays (type.isArray() must be true)
      * @param callback the callback triggered for each pair of elements
      */
     public static void process_arrays(CodeEmitter e, Type type, ProcessArrayCallback callback) {
@@ -153,17 +154,17 @@ public class EmitUtils {
     public static void string_switch(CodeEmitter e, String[] strings, int switchStyle, ObjectSwitchCallback callback) {
         try {
             switch (switchStyle) {
-            case Constants.SWITCH_STYLE_TRIE:
-                string_switch_trie(e, strings, callback);
-                break;
-            case Constants.SWITCH_STYLE_HASH:
-                string_switch_hash(e, strings, callback, false);
-                break;
-            case Constants.SWITCH_STYLE_HASHONLY:
-                string_switch_hash(e, strings, callback, true);
-                break;
-            default:
-                throw new IllegalArgumentException("unknown switch style " + switchStyle);
+                case Constants.SWITCH_STYLE_TRIE:
+                    string_switch_trie(e, strings, callback);
+                    break;
+                case Constants.SWITCH_STYLE_HASH:
+                    string_switch_hash(e, strings, callback, false);
+                    break;
+                case Constants.SWITCH_STYLE_HASHONLY:
+                    string_switch_hash(e, strings, callback, true);
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown switch style " + switchStyle);
             }
         } catch (RuntimeException ex) {
             throw ex;
@@ -181,20 +182,21 @@ public class EmitUtils {
         final Label end = e.make_label();
         final Map buckets = CollectionUtils.bucket(Arrays.asList(strings), new Transformer() {
             public Object transform(Object value) {
-                return new Integer(((String)value).length());
+                return new Integer(((String) value).length());
             }
         });
         e.dup();
         e.invoke_virtual(Constants.TYPE_STRING, STRING_LENGTH);
         e.process_switch(getSwitchKeys(buckets), new ProcessSwitchCallback() {
-                public void processCase(int key, Label ignore_end) throws Exception {
-                    List bucket = (List)buckets.get(new Integer(key));
-                    stringSwitchHelper(e, bucket, callback, def, end, 0);
-                }
-                public void processDefault() {
-                    e.goTo(def);
-                }
-            });
+            public void processCase(int key, Label ignore_end) throws Exception {
+                List bucket = (List) buckets.get(new Integer(key));
+                stringSwitchHelper(e, bucket, callback, def, end, 0);
+            }
+
+            public void processDefault() {
+                e.goTo(def);
+            }
+        });
         e.mark(def);
         e.pop();
         callback.processDefault();
@@ -207,36 +209,37 @@ public class EmitUtils {
                                            final Label def,
                                            final Label end,
                                            final int index) throws Exception {
-        final int len = ((String)strings.get(0)).length();
+        final int len = ((String) strings.get(0)).length();
         final Map buckets = CollectionUtils.bucket(strings, new Transformer() {
             public Object transform(Object value) {
-                return new Integer(((String)value).charAt(index));
+                return new Integer(((String) value).charAt(index));
             }
         });
         e.dup();
         e.push(index);
         e.invoke_virtual(Constants.TYPE_STRING, STRING_CHAR_AT);
         e.process_switch(getSwitchKeys(buckets), new ProcessSwitchCallback() {
-                public void processCase(int key, Label ignore_end) throws Exception {
-                    List bucket = (List)buckets.get(new Integer(key));
-                    if (index + 1 == len) {
-                        e.pop();
-                        callback.processCase(bucket.get(0), end);
-                    } else {
-                        stringSwitchHelper(e, bucket, callback, def, end, index + 1);
-                    }
+            public void processCase(int key, Label ignore_end) throws Exception {
+                List bucket = (List) buckets.get(new Integer(key));
+                if (index + 1 == len) {
+                    e.pop();
+                    callback.processCase(bucket.get(0), end);
+                } else {
+                    stringSwitchHelper(e, bucket, callback, def, end, index + 1);
                 }
-                public void processDefault() {
-                    e.goTo(def);
-                }
-            });
+            }
+
+            public void processDefault() {
+                e.goTo(def);
+            }
+        });
     }
 
     static int[] getSwitchKeys(Map buckets) {
         int[] keys = new int[buckets.size()];
         int index = 0;
-        for (Iterator it = buckets.keySet().iterator(); it.hasNext();) {
-            keys[index++] = ((Integer)it.next()).intValue();
+        for (Iterator it = buckets.keySet().iterator(); it.hasNext(); ) {
+            keys[index++] = ((Integer) it.next()).intValue();
         }
         Arrays.sort(keys);
         return keys;
@@ -257,15 +260,15 @@ public class EmitUtils {
         e.invoke_virtual(Constants.TYPE_OBJECT, HASH_CODE);
         e.process_switch(getSwitchKeys(buckets), new ProcessSwitchCallback() {
             public void processCase(int key, Label ignore_end) throws Exception {
-                List bucket = (List)buckets.get(new Integer(key));
+                List bucket = (List) buckets.get(new Integer(key));
                 Label next = null;
                 if (skipEquals && bucket.size() == 1) {
                     if (skipEquals)
                         e.pop();
-                    callback.processCase((String)bucket.get(0), end);
+                    callback.processCase((String) bucket.get(0), end);
                 } else {
-                    for (Iterator it = bucket.iterator(); it.hasNext();) {
-                        String string = (String)it.next();
+                    for (Iterator it = bucket.iterator(); it.hasNext(); ) {
+                        String string = (String) it.next();
                         if (next != null) {
                             e.mark(next);
                         }
@@ -284,6 +287,7 @@ public class EmitUtils {
                     }
                 }
             }
+
             public void processDefault() {
                 e.pop();
             }
@@ -353,13 +357,13 @@ public class EmitUtils {
         } else {
             Class type = obj.getClass();
             if (type.isArray()) {
-                push_array(e, (Object[])obj);
+                push_array(e, (Object[]) obj);
             } else if (obj instanceof String) {
-                e.push((String)obj);
+                e.push((String) obj);
             } else if (obj instanceof Type) {
-                load_class(e, (Type)obj);
+                load_class(e, (Type) obj);
             } else if (obj instanceof Class) {
-                load_class(e, Type.getType((Class)obj));
+                load_class(e, Type.getType((Class) obj));
             } else if (obj instanceof BigInteger) {
                 e.new_instance(Constants.TYPE_BIG_INTEGER);
                 e.dup();
@@ -445,21 +449,21 @@ public class EmitUtils {
 
     private static void hash_primitive(CodeEmitter e, Type type) {
         switch (type.getSort()) {
-        case Type.BOOLEAN:
-            // f ? 0 : 1
-            e.push(1);
-            e.math(e.XOR, Type.INT_TYPE);
-            break;
-        case Type.FLOAT:
-            // Float.floatToIntBits(f)
-            e.invoke_static(Constants.TYPE_FLOAT, FLOAT_TO_INT_BITS);
-            break;
-        case Type.DOUBLE:
-            // Double.doubleToLongBits(f), hash_code(Long.TYPE)
-            e.invoke_static(Constants.TYPE_DOUBLE, DOUBLE_TO_LONG_BITS);
-            // fall through
-        case Type.LONG:
-            hash_long(e);
+            case Type.BOOLEAN:
+                // f ? 0 : 1
+                e.push(1);
+                e.math(e.XOR, Type.INT_TYPE);
+                break;
+            case Type.FLOAT:
+                // Float.floatToIntBits(f)
+                e.invoke_static(Constants.TYPE_FLOAT, FLOAT_TO_INT_BITS);
+                break;
+            case Type.DOUBLE:
+                // Double.doubleToLongBits(f), hash_code(Long.TYPE)
+                e.invoke_static(Constants.TYPE_DOUBLE, DOUBLE_TO_LONG_BITS);
+                // fall through
+            case Type.LONG:
+                hash_long(e);
         }
     }
 
@@ -539,7 +543,8 @@ public class EmitUtils {
      * If both objects on the top of the stack are non-null, does nothing.
      * If one is null, or both are null, both are popped off and execution
      * branches to the respective label.
-     * @param oneNull label to branch to if only one of the objects is null
+     *
+     * @param oneNull  label to branch to if only one of the objects is null
      * @param bothNull label to branch to if both of the objects are null
      */
     private static void nullcmp(CodeEmitter e, Label oneNull, Label bothNull) {
@@ -790,7 +795,7 @@ public class EmitUtils {
                                            final Label end,
                                            final BitSet checked) throws Exception {
         if (members.size() == 1) {
-            MethodInfo member = (MethodInfo)members.get(0);
+            MethodInfo member = (MethodInfo) members.get(0);
             Type[] types = typer.getParameterTypes(member);
             // need to check classes that have not already been checked via switches
             for (int i = 0; i < types.length; i++) {
@@ -807,14 +812,14 @@ public class EmitUtils {
             callback.processCase(member, end);
         } else {
             // choose the index that has the best chance of uniquely identifying member
-            Type[] example = typer.getParameterTypes((MethodInfo)members.get(0));
+            Type[] example = typer.getParameterTypes((MethodInfo) members.get(0));
             Map buckets = null;
             int index = -1;
             for (int i = 0; i < example.length; i++) {
                 final int j = i;
                 Map test = CollectionUtils.bucket(members, new Transformer() {
                     public Object transform(Object value) {
-                        return TypeUtils.emulateClassGetName(typer.getParameterTypes((MethodInfo)value)[j]);
+                        return TypeUtils.emulateClassGetName(typer.getParameterTypes((MethodInfo) value)[j]);
                     }
                 });
                 if (buckets == null || test.size() > buckets.size()) {
@@ -834,11 +839,12 @@ public class EmitUtils {
                 e.invoke_virtual(Constants.TYPE_CLASS, GET_NAME);
 
                 final Map fbuckets = buckets;
-                String[] names = (String[])buckets.keySet().toArray(new String[buckets.size()]);
+                String[] names = (String[]) buckets.keySet().toArray(new String[buckets.size()]);
                 EmitUtils.string_switch(e, names, Constants.SWITCH_STYLE_HASH, new ObjectSwitchCallback() {
                     public void processCase(Object key, Label dontUseEnd) throws Exception {
-                        member_helper_type(e, (List)fbuckets.get(key), callback, typer, def, end, checked);
+                        member_helper_type(e, (List) fbuckets.get(key), callback, typer, def, end, checked);
                     }
+
                     public void processDefault() throws Exception {
                         e.goTo(def);
                     }
@@ -869,20 +875,20 @@ public class EmitUtils {
         String property = TypeUtils.upperFirst(name);
         CodeEmitter e;
         e = ce.begin_method(Constants.ACC_PUBLIC,
-                            new Signature("get" + property,
-                                          type,
-                                          Constants.TYPES_EMPTY),
-                            null);
+                new Signature("get" + property,
+                        type,
+                        Constants.TYPES_EMPTY),
+                null);
         e.load_this();
         e.getfield(fieldName);
         e.return_value();
         e.end_method();
 
         e = ce.begin_method(Constants.ACC_PUBLIC,
-                            new Signature("set" + property,
-                                          Type.VOID_TYPE,
-                                          new Type[]{ type }),
-                            null);
+                new Signature("set" + property,
+                        Type.VOID_TYPE,
+                        new Type[]{type}),
+                null);
         e.load_this();
         e.load_arg(0);
         e.putfield(fieldName);
@@ -939,7 +945,7 @@ public class EmitUtils {
 
     public static CodeEmitter begin_method(ClassEmitter e, MethodInfo method, int access) {
         return e.begin_method(access,
-                              method.getSignature(),
-                              method.getExceptionTypes());
+                method.getSignature(),
+                method.getExceptionTypes());
     }
 }

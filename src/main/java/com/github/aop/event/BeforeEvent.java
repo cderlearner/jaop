@@ -1,6 +1,6 @@
 package com.github.aop.event;
 
-public class BeforeEvent extends InvokeEvent{
+public class BeforeEvent extends InvokeEvent {
 
     /**
      * 触发调用事件的ClassLoader
@@ -34,6 +34,7 @@ public class BeforeEvent extends InvokeEvent{
 
     /**
      * 构造调用BEFORE事件
+     *
      * @param javaClassLoader 触发调用事件的ClassLoader
      * @param javaClassName   触发调用事件的类名称<span>java.lang.String</span>
      * @param javaMethodName  触发调用事件的方法名称
@@ -41,9 +42,9 @@ public class BeforeEvent extends InvokeEvent{
      * @param target          触发调用事件的对象(静态方法为null)
      * @param argumentArray   触发调用事件的方法参数
      */
-    public BeforeEvent( ClassLoader javaClassLoader, String javaClassName,
-                        String javaMethodName, String javaMethodDesc,
-                        Object target, Object[] argumentArray) {
+    public BeforeEvent(ClassLoader javaClassLoader, String javaClassName,
+                       String javaMethodName, String javaMethodDesc,
+                       Object target, Object[] argumentArray) {
         super(Type.BEFORE);
         this.javaClassLoader = javaClassLoader;
         this.javaClassName = javaClassName;

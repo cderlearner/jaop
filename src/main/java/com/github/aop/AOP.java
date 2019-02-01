@@ -24,26 +24,24 @@ public class AOP {
     private IWeaveManager weaveManager = WeaveManager.getSingleton();
 
     //只能反射调用
-    public Class createReflectClass() throws AOPException{
+    public Class createReflectClass() throws AOPException {
         Assert.notNull(targetClass, "目标类不能为空");
-        Assert.notNull(eventListener,"aop监听器不能为空");
-        Assert.notBlank(targetMethodName,"目标方法不能为空");
-       Class clazz =  weaveManager.weave(targetClass, targetMethodName, eventListener);
-       return clazz;
+        Assert.notNull(eventListener, "aop监听器不能为空");
+        Assert.notBlank(targetMethodName, "目标方法不能为空");
+        return weaveManager.weave(targetClass, targetMethodName, eventListener);
     }
 
     public Class createCgFactory() throws Throwable {
         Assert.notNull(targetClass, "目标类不能为空");
-        Assert.notNull(eventListener,"aop监听器不能为空");
-        Assert.notBlank(targetMethodName,"目标方法不能为空");
-        Class clazz = weaveManager.weaveSubClass(targetClass, targetMethodName, eventListener);
-        return clazz;
+        Assert.notNull(eventListener, "aop监听器不能为空");
+        Assert.notBlank(targetMethodName, "目标方法不能为空");
+        return weaveManager.weaveSubClass(targetClass, targetMethodName, eventListener);
     }
 
     public Object createIntance() throws Throwable {
         Assert.notNull(targetClass, "目标类不能为空");
-        Assert.notNull(eventListener,"aop监听器不能为空");
-        Assert.notBlank(targetMethodName,"目标方法不能为空");
+        Assert.notNull(eventListener, "aop监听器不能为空");
+        Assert.notBlank(targetMethodName, "目标方法不能为空");
         Class clazz = weaveManager.weaveSubClass(targetClass, targetMethodName, eventListener);
         return clazz.newInstance();
     }

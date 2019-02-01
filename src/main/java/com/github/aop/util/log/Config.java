@@ -1,4 +1,4 @@
-package com.github.aop.log;
+package com.github.aop.util.log;
 
 public class Config {
 

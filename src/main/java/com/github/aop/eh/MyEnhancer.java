@@ -29,7 +29,7 @@ public class MyEnhancer {
 
     public void setSuperclass(Class superclass) {
         if (superclass != null && superclass.isInterface()) {
-            setInterfaces(new Class[]{ superclass });
+            setInterfaces(new Class[]{superclass});
         } else if (superclass != null && superclass.equals(Object.class)) {
             // affects choice of ClassLoader
             this.superclass = null;
@@ -37,7 +37,7 @@ public class MyEnhancer {
             this.superclass = superclass;
         }
 
-        newClassName = superclass.getName()+"$$EnhancerByLJX$$5078ddf5";
+        newClassName = superclass.getName() + "$$EnhancerByLJX$$5078ddf5";
         newType = TypeUtils.parseType(newClassName);
     }
 
@@ -45,13 +45,11 @@ public class MyEnhancer {
         this.interfaces = interfaces;
     }
 
-    public static void getMethods(Class superclass, Class[] interfaces, List methods)
-    {
+    public static void getMethods(Class superclass, Class[] interfaces, List methods) {
         getMethods(superclass, interfaces, methods, null, null);
     }
 
-    private static void getMethods(Class superclass, Class[] interfaces, List methods, List interfaceMethods, Set forcePublic)
-    {
+    private static void getMethods(Class superclass, Class[] interfaces, List methods, List interfaceMethods, Set forcePublic) {
         ReflectUtils.addAllMethods(superclass, methods);
         List target = (interfaceMethods != null) ? interfaceMethods : methods;
         if (interfaces != null) {
@@ -87,7 +85,7 @@ public class MyEnhancer {
 
         List methods = CollectionUtils.transform(actualMethods, new Transformer() {
             public Object transform(Object value) {
-                Method method = (Method)value;
+                Method method = (Method) value;
                 int modifiers = Constants.ACC_FINAL
                         | (method.getModifiers()
                         & ~Constants.ACC_ABSTRACT
@@ -115,7 +113,7 @@ public class MyEnhancer {
         emitConstructors(e, constructorInfo);
 
 
-        if(useFactory) {
+        if (useFactory) {
             emitNewInstance(e);
         }
 
@@ -124,8 +122,8 @@ public class MyEnhancer {
 
     private void emitConstructors(ClassEmitter ce, List constructors) {
         boolean seenNull = false;
-        for (Iterator it = constructors.iterator(); it.hasNext();) {
-            MethodInfo constructor = (MethodInfo)it.next();
+        for (Iterator it = constructors.iterator(); it.hasNext(); ) {
+            MethodInfo constructor = (MethodInfo) it.next();
             if (!"()V".equals(constructor.getSignature().getDescriptor())) {
                 continue;
             }
@@ -167,13 +165,13 @@ public class MyEnhancer {
         Iterator it2 = (actualMethods != null) ? actualMethods.iterator() : null;
 
         while (it1.hasNext()) {
-            MethodInfo method = (MethodInfo)it1.next();
-            Method actualMethod = (it2 != null) ? (Method)it2.next() : null;
+            MethodInfo method = (MethodInfo) it1.next();
+            Method actualMethod = (it2 != null) ? (Method) it2.next() : null;
 
             // Optimization: build up a map of Class -> bridge methods in class
             // so that we can look up all the bridge methods in one pass for a class.
             if (TypeUtils.isBridge(actualMethod.getModifiers())) {
-                Set bridges = (Set)declToBridge.get(actualMethod.getDeclaringClass());
+                Set bridges = (Set) declToBridge.get(actualMethod.getDeclaringClass());
                 if (bridges == null) {
                     bridges = new HashSet();
                     declToBridge.put(actualMethod.getDeclaringClass(), bridges);
@@ -182,8 +180,8 @@ public class MyEnhancer {
             }
         }
 
-        for (Iterator it = methods.iterator(); it.hasNext();) {
-            MethodInfo method = (MethodInfo)it.next();
+        for (Iterator it = methods.iterator(); it.hasNext(); ) {
+            MethodInfo method = (MethodInfo) it.next();
             CodeEmitter e = EmitUtils.begin_method(ce, method);
 
             e.load_this();

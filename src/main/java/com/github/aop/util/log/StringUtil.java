@@ -1,4 +1,4 @@
-package com.github.aop.log;
+package com.github.aop.util.log;
 
 public final class StringUtil {
     public static boolean isEmpty(String str) {

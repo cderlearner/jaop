@@ -97,7 +97,7 @@ public class ReflectUtils {
      */
     public static Class<?> defineClass(final ClassLoader loader,
                                        final String javaClassName,
-                                       final byte[] classByteArray) throws AOPException{
+                                       final byte[] classByteArray) throws AOPException {
 
         final Method defineClassMethod =
                 unCaughtGetClassDeclaredJavaMethod(ClassLoader.class, "defineClass", String.class, byte[].class, int.class, int.class);

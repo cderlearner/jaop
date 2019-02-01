@@ -10,8 +10,8 @@ public interface AsmMethods {
         }
 
         public static Method getAsmMethod(final Class<?> clazz,
-                                   final String methodName,
-                                   final Class<?>... parameterClassArray) {
+                                          final String methodName,
+                                          final Class<?>... parameterClassArray) {
             return Method.getMethod(ReflectUtils.unCaughtGetClassDeclaredJavaMethod(clazz, methodName, parameterClassArray));
         }
     }

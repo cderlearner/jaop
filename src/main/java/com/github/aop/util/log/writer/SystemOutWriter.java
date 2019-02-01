@@ -1,6 +1,6 @@
-package com.github.aop.log.writer;
+package com.github.aop.util.log.writer;
 
-import com.github.aop.log.api.*;
+import com.github.aop.util.log.api.*;
 import java.io.PrintStream;
 
 public enum SystemOutWriter implements IWriter {

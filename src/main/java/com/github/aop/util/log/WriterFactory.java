@@ -1,7 +1,7 @@
-package com.github.aop.log;
+package com.github.aop.util.log;
 
-import com.github.aop.log.api.*;
-import com.github.aop.log.writer.*;
+import com.github.aop.util.log.api.*;
+import com.github.aop.util.log.writer.*;
 
 public class WriterFactory {
     public static IWriter getLogWriter() {

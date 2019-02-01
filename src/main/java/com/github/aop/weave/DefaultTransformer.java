@@ -1,14 +1,15 @@
 package com.github.aop.weave;
 
 import com.github.aop.exception.AOPException;
-import com.github.aop.log.LoggerFactory;
+import com.github.aop.util.log.LoggerFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import com.github.aop.filter.Filter;
 import com.github.aop.util.*;
-import com.github.aop.log.api.*;
+import com.github.aop.util.log.api.*;
+
 import static com.github.aop.util.AopUtils.toJavaClassName;
 import static com.github.aop.util.AopUtils.toJavaClassNameArray;
 
@@ -16,7 +17,7 @@ import static org.objectweb.asm.ClassReader.EXPAND_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
 
-public class DefaultTransformer implements Transformer{
+public class DefaultTransformer implements Transformer {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTransformer.class);
 
@@ -29,7 +30,7 @@ public class DefaultTransformer implements Transformer{
     }
 
     @Override
-    public byte[] toByteCodeArray(ClassLoader targetClassLoader, byte[] srcByteArray) throws AOPException{
+    public byte[] toByteCodeArray(ClassLoader targetClassLoader, byte[] srcByteArray) throws AOPException {
         final ClassReader cr = new ClassReader(srcByteArray);
 
         // 如果目标对象不在类匹配范围,则主动忽略增强
@@ -149,7 +150,8 @@ public class DefaultTransformer implements Transformer{
 
     /**
      * 是否需要忽略增强的类
-     * @param cr                ClassReader
+     *
+     * @param cr ClassReader
      * @return true:忽略增强;false:需要增强
      */
     private boolean isIgnoreClass(final ClassReader cr) {

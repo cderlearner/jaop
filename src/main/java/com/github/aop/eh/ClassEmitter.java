@@ -39,22 +39,25 @@ public class ClassEmitter extends ClassTransformer {
             public Type getType() {
                 return classType;
             }
+
             public Type getSuperType() {
                 return (superType != null) ? superType : Constants.TYPE_OBJECT;
             }
+
             public Type[] getInterfaces() {
                 return interfaces;
             }
+
             public int getModifiers() {
                 return access;
             }
         };
         cv.visit(version,
-                 access,
-                 classInfo.getType().getInternalName(),
-                 null,
-                 classInfo.getSuperType().getInternalName(),
-                 TypeUtils.toInternalNames(interfaces));
+                access,
+                classInfo.getType().getInternalName(),
+                null,
+                classInfo.getSuperType().getInternalName(),
+                TypeUtils.toInternalNames(interfaces));
         if (source != null)
             cv.visitSource(source, null);
         init();
@@ -84,16 +87,17 @@ public class ClassEmitter extends ClassTransformer {
         if (classInfo == null)
             throw new IllegalStateException("classInfo is null! " + this);
         MethodVisitor v = cv.visitMethod(access,
-                                         sig.getName(),
-                                         sig.getDescriptor(),
-                                         null,
-                                         TypeUtils.toInternalNames(exceptions));
+                sig.getName(),
+                sig.getDescriptor(),
+                null,
+                TypeUtils.toInternalNames(exceptions));
         if (sig.equals(Constants.SIG_STATIC) && !TypeUtils.isInterface(getAccess())) {
             rawStaticInit = v;
             MethodVisitor wrapped = new MethodVisitor(Opcodes.ASM5, v) {
                 public void visitMaxs(int maxStack, int maxLocals) {
                     // ignore
                 }
+
                 public void visitInsn(int insn) {
                     if (insn != Constants.RETURN) {
                         super.visitInsn(insn);
@@ -111,7 +115,7 @@ public class ClassEmitter extends ClassTransformer {
     }
 
     public void declare_field(int access, String name, Type type, Object value) {
-        FieldInfo existing = (FieldInfo)fieldInfo.get(name);
+        FieldInfo existing = (FieldInfo) fieldInfo.get(name);
         FieldInfo info = new FieldInfo(access, name, type, value);
         if (existing != null) {
             if (!info.equals(existing)) {
@@ -129,19 +133,19 @@ public class ClassEmitter extends ClassTransformer {
     }
 
     FieldInfo getFieldInfo(String name) {
-        FieldInfo field = (FieldInfo)fieldInfo.get(name);
+        FieldInfo field = (FieldInfo) fieldInfo.get(name);
         if (field == null) {
             throw new IllegalArgumentException("Field " + name + " is not declared in " + getClassType().getClassName());
         }
         return field;
     }
-    
+
     static class FieldInfo {
         int access;
         String name;
         Type type;
         Object value;
-        
+
         public FieldInfo(int access, String name, Type type, Object value) {
             this.access = access;
             this.name = name;
@@ -154,10 +158,10 @@ public class ClassEmitter extends ClassTransformer {
                 return false;
             if (!(o instanceof FieldInfo))
                 return false;
-            FieldInfo other = (FieldInfo)o;
+            FieldInfo other = (FieldInfo) o;
             if (access != other.access ||
-                !name.equals(other.name) ||
-                !type.equals(other.type)) {
+                    !name.equals(other.name) ||
+                    !type.equals(other.type)) {
                 return false;
             }
             if ((value == null) ^ (other.value == null))
@@ -179,17 +183,17 @@ public class ClassEmitter extends ClassTransformer {
                       String superName,
                       String[] interfaces) {
         begin_class(version,
-                    access,
-                    name.replace('/', '.'),
-                    TypeUtils.fromInternalName(superName),
-                    TypeUtils.fromInternalNames(interfaces),
-                    null); // TODO
+                access,
+                name.replace('/', '.'),
+                TypeUtils.fromInternalName(superName),
+                TypeUtils.fromInternalNames(interfaces),
+                null); // TODO
     }
-    
+
     public void visitEnd() {
         end_class();
     }
-    
+
     public FieldVisitor visitField(int access,
                                    String name,
                                    String desc,
@@ -198,14 +202,14 @@ public class ClassEmitter extends ClassTransformer {
         declare_field(access, name, Type.getType(desc), value);
         return null; // TODO
     }
-    
+
     public MethodVisitor visitMethod(int access,
                                      String name,
                                      String desc,
                                      String signature,
                                      String[] exceptions) {
         return begin_method(access,
-                            new Signature(name, desc),
-                            TypeUtils.fromInternalNames(exceptions));        
+                new Signature(name, desc),
+                TypeUtils.fromInternalNames(exceptions));
     }
 }

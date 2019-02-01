@@ -3,8 +3,9 @@ package com.github.aop.listener;
 import com.github.aop.event.BeforeEvent;
 import com.github.aop.event.Event;
 import com.github.aop.event.EventBuffer;
-import com.github.aop.log.LoggerFactory;
-import com.github.aop.log.api.Logger;
+import com.github.aop.util.log.LoggerFactory;
+import com.github.aop.util.log.api.Logger;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,11 +42,11 @@ public class EventListenerHandlers {
     /**
      * 注册事件处理器
      *
-     * @param listenerId     事件监听器ID
-     * @param listener       事件监听器
+     * @param listenerId 事件监听器ID
+     * @param listener   事件监听器
      */
     private void active(final int listenerId,
-                       final EventListener listener) {
+                        final EventListener listener) {
         globalEventListenerMap.put(listenerId, listener);
         logger.info("active listener success. listener-id={};listener={};", listenerId, listener);
     }
@@ -69,13 +70,13 @@ public class EventListenerHandlers {
      *
      * @param listenerId 处理器ID
      * @param event      调用事件
-     * @param listener       事件处理器
+     * @param listener   事件处理器
      * @return 处理返回结果
      * @throws Throwable 当出现未知异常时,且事件处理器为中断流程事件时抛出
      */
     private void handleEvent(final int listenerId,
-                                final Event event,
-                                final EventListener listener) throws Throwable {
+                             final Event event,
+                             final EventListener listener) throws Throwable {
 
         try {
             // 调用事件处理
@@ -85,8 +86,7 @@ public class EventListenerHandlers {
                         listenerId, event.type
                 );
             }
-        }
-        catch (Throwable throwable) {
+        } catch (Throwable throwable) {
             logger.error("", throwable);
 
         }
@@ -94,11 +94,11 @@ public class EventListenerHandlers {
 
 
     private void handleOnBefore(final int listenerId,
-                                   final String javaClassName,
-                                   final String javaMethodName,
-                                   final String javaMethodDesc,
-                                   final Object target,
-                                   final Object[] argumentArray) throws Throwable {
+                                final String javaClassName,
+                                final String javaMethodName,
+                                final String javaMethodDesc,
+                                final Object target,
+                                final Object[] argumentArray) throws Throwable {
 
         // 获取事件处理器
         final EventListener listener = globalEventListenerMap.get(listenerId);
@@ -127,7 +127,7 @@ public class EventListenerHandlers {
     }
 
     private void handleOnEnd(final int listenerId,
-                                final Object object) throws Throwable {
+                             final Object object) throws Throwable {
         final EventListener listener = globalEventListenerMap.get(listenerId);
 
         final Event event = eventPool.borrowReturnEvent(object);
@@ -142,7 +142,8 @@ public class EventListenerHandlers {
 
     // ----------------------------------- 从这里开始就是提供给Spy的static方法 -----------------------------------
 
-    private EventListenerHandlers(){}
+    private EventListenerHandlers() {
+    }
 
     private static final EventListenerHandlers singleton = new EventListenerHandlers();
 
@@ -151,11 +152,11 @@ public class EventListenerHandlers {
     }
 
     public static void onBefore(final int listenerId,
-                                  final String javaClassName,
-                                  final String javaMethodName,
-                                  final String javaMethodDesc,
-                                  final Object target,
-                                  final Object[] argumentArray) throws Throwable {
+                                final String javaClassName,
+                                final String javaMethodName,
+                                final String javaMethodDesc,
+                                final Object target,
+                                final Object[] argumentArray) throws Throwable {
         singleton.handleOnBefore(
                 listenerId,
                 javaClassName,

@@ -2,7 +2,7 @@ package com.github.aop.filter;
 
 import java.util.Set;
 
-public class MethodSetFilter implements Filter{
+public class MethodSetFilter implements Filter {
 
     private Set<String> methodNameSet;
 
@@ -18,7 +18,7 @@ public class MethodSetFilter implements Filter{
     @Override
     public boolean doMethodFilter(int access, String javaMethodName, String[] parameterTypeJavaClassNameArray, String[] throwsTypeJavaClassNameArray) {
 
-        if(methodNameSet.contains(javaMethodName)) {
+        if (methodNameSet.contains(javaMethodName)) {
             return true;
         }
 

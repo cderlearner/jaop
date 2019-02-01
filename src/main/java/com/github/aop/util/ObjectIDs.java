@@ -15,7 +15,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 3. int为[0,{@link Integer#MAX_VALUE}]之间的整数
  * 4. 这个类当前无需考虑对象溢出的情况，因为我不需要，我放入的对象数量很少，就这么简单
  * </p>
- *
  */
 public class ObjectIDs {
 

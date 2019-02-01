@@ -7,21 +7,21 @@ import java.util.Arrays;
 
 public class CodeEmitter extends LocalVariablesSorter {
     private static final Signature BOOLEAN_VALUE =
-      TypeUtils.parseSignature("boolean booleanValue()");
+            TypeUtils.parseSignature("boolean booleanValue()");
     private static final Signature CHAR_VALUE =
-      TypeUtils.parseSignature("char charValue()");
+            TypeUtils.parseSignature("char charValue()");
     private static final Signature LONG_VALUE =
-      TypeUtils.parseSignature("long longValue()");
+            TypeUtils.parseSignature("long longValue()");
     private static final Signature DOUBLE_VALUE =
-      TypeUtils.parseSignature("double doubleValue()");
+            TypeUtils.parseSignature("double doubleValue()");
     private static final Signature FLOAT_VALUE =
-      TypeUtils.parseSignature("float floatValue()");
+            TypeUtils.parseSignature("float floatValue()");
     private static final Signature INT_VALUE =
-      TypeUtils.parseSignature("int intValue()");
+            TypeUtils.parseSignature("int intValue()");
     private static final Signature CSTRUCT_NULL =
-      TypeUtils.parseConstructor("");
+            TypeUtils.parseConstructor("");
     private static final Signature CSTRUCT_STRING =
-      TypeUtils.parseConstructor("String");
+            TypeUtils.parseConstructor("String");
 
     public static final int ADD = Constants.IADD;
     public static final int MUL = Constants.IMUL;
@@ -45,8 +45,7 @@ public class CodeEmitter extends LocalVariablesSorter {
     private State state;
 
     private static class State
-    extends MethodInfo
-    {
+            extends MethodInfo {
         ClassInfo classInfo;
         int access;
         Signature sig;
@@ -130,14 +129,22 @@ public class CodeEmitter extends LocalVariablesSorter {
             throw new IllegalStateException("end of block is unset");
         }
         mv.visitTryCatchBlock(block.getStart(),
-                              block.getEnd(),
-                              mark(),
-                              exception.getInternalName());
+                block.getEnd(),
+                mark(),
+                exception.getInternalName());
     }
 
-    public void goTo(Label label) { mv.visitJumpInsn(Constants.GOTO, label); }
-    public void ifnull(Label label) { mv.visitJumpInsn(Constants.IFNULL, label); }
-    public void ifnonnull(Label label) { mv.visitJumpInsn(Constants.IFNONNULL, label); }
+    public void goTo(Label label) {
+        mv.visitJumpInsn(Constants.GOTO, label);
+    }
+
+    public void ifnull(Label label) {
+        mv.visitJumpInsn(Constants.IFNULL, label);
+    }
+
+    public void ifnonnull(Label label) {
+        mv.visitJumpInsn(Constants.IFNONNULL, label);
+    }
 
     public void if_jump(int mode, Label label) {
         mv.visitJumpInsn(mode, label);
@@ -151,55 +158,98 @@ public class CodeEmitter extends LocalVariablesSorter {
         int intOp = -1;
         int jumpmode = mode;
         switch (mode) {
-        case GE: jumpmode = LT; break;
-        case LE: jumpmode = GT; break;
+            case GE:
+                jumpmode = LT;
+                break;
+            case LE:
+                jumpmode = GT;
+                break;
         }
         switch (type.getSort()) {
-        case Type.LONG:
-            mv.visitInsn(Constants.LCMP);
-            break;
-        case Type.DOUBLE:
-            mv.visitInsn(Constants.DCMPG);
-            break;
-        case Type.FLOAT:
-            mv.visitInsn(Constants.FCMPG);
-            break;
-        case Type.ARRAY:
-        case Type.OBJECT:
-            switch (mode) {
-            case EQ:
-                mv.visitJumpInsn(Constants.IF_ACMPEQ, label);
+            case Type.LONG:
+                mv.visitInsn(Constants.LCMP);
+                break;
+            case Type.DOUBLE:
+                mv.visitInsn(Constants.DCMPG);
+                break;
+            case Type.FLOAT:
+                mv.visitInsn(Constants.FCMPG);
+                break;
+            case Type.ARRAY:
+            case Type.OBJECT:
+                switch (mode) {
+                    case EQ:
+                        mv.visitJumpInsn(Constants.IF_ACMPEQ, label);
+                        return;
+                    case NE:
+                        mv.visitJumpInsn(Constants.IF_ACMPNE, label);
+                        return;
+                }
+                throw new IllegalArgumentException("Bad comparison for type " + type);
+            default:
+                switch (mode) {
+                    case EQ:
+                        intOp = Constants.IF_ICMPEQ;
+                        break;
+                    case NE:
+                        intOp = Constants.IF_ICMPNE;
+                        break;
+                    case GE:
+                        swap(); /* fall through */
+                    case LT:
+                        intOp = Constants.IF_ICMPLT;
+                        break;
+                    case LE:
+                        swap(); /* fall through */
+                    case GT:
+                        intOp = Constants.IF_ICMPGT;
+                        break;
+                }
+                mv.visitJumpInsn(intOp, label);
                 return;
-            case NE:
-                mv.visitJumpInsn(Constants.IF_ACMPNE, label);
-                return;
-            }
-            throw new IllegalArgumentException("Bad comparison for type " + type);
-        default:
-            switch (mode) {
-            case EQ: intOp = Constants.IF_ICMPEQ; break;
-            case NE: intOp = Constants.IF_ICMPNE; break;
-            case GE: swap(); /* fall through */
-            case LT: intOp = Constants.IF_ICMPLT; break;
-            case LE: swap(); /* fall through */
-            case GT: intOp = Constants.IF_ICMPGT; break;
-            }
-            mv.visitJumpInsn(intOp, label);
-            return;
         }
         if_jump(jumpmode, label);
     }
 
-    public void pop() { mv.visitInsn(Constants.POP); }
-    public void pop2() { mv.visitInsn(Constants.POP2); }
-    public void dup() { mv.visitInsn(Constants.DUP); }
-    public void dup2() { mv.visitInsn(Constants.DUP2); }
-    public void dup_x1() { mv.visitInsn(Constants.DUP_X1); }
-    public void dup_x2() { mv.visitInsn(Constants.DUP_X2); }
-    public void dup2_x1() { mv.visitInsn(Constants.DUP2_X1); }
-    public void dup2_x2() { mv.visitInsn(Constants.DUP2_X2); }
-    public void swap() { mv.visitInsn(Constants.SWAP); }
-    public void aconst_null() { mv.visitInsn(Constants.ACONST_NULL); }
+    public void pop() {
+        mv.visitInsn(Constants.POP);
+    }
+
+    public void pop2() {
+        mv.visitInsn(Constants.POP2);
+    }
+
+    public void dup() {
+        mv.visitInsn(Constants.DUP);
+    }
+
+    public void dup2() {
+        mv.visitInsn(Constants.DUP2);
+    }
+
+    public void dup_x1() {
+        mv.visitInsn(Constants.DUP_X1);
+    }
+
+    public void dup_x2() {
+        mv.visitInsn(Constants.DUP_X2);
+    }
+
+    public void dup2_x1() {
+        mv.visitInsn(Constants.DUP2_X1);
+    }
+
+    public void dup2_x2() {
+        mv.visitInsn(Constants.DUP2_X2);
+    }
+
+    public void swap() {
+        mv.visitInsn(Constants.SWAP);
+    }
+
+    public void aconst_null() {
+        mv.visitInsn(Constants.ACONST_NULL);
+    }
 
     public void swap(Type prev, Type type) {
         if (type.getSize() == 1) {
@@ -220,13 +270,25 @@ public class CodeEmitter extends LocalVariablesSorter {
         }
     }
 
-    public void monitorenter() { mv.visitInsn(Constants.MONITORENTER); }
-    public void monitorexit() { mv.visitInsn(Constants.MONITOREXIT); }
+    public void monitorenter() {
+        mv.visitInsn(Constants.MONITORENTER);
+    }
 
-    public void math(int op, Type type) { mv.visitInsn(type.getOpcode(op)); }
+    public void monitorexit() {
+        mv.visitInsn(Constants.MONITOREXIT);
+    }
 
-    public void array_load(Type type) { mv.visitInsn(type.getOpcode(Constants.IALOAD)); }
-    public void array_store(Type type) { mv.visitInsn(type.getOpcode(Constants.IASTORE)); }
+    public void math(int op, Type type) {
+        mv.visitInsn(type.getOpcode(op));
+    }
+
+    public void array_load(Type type) {
+        mv.visitInsn(type.getOpcode(Constants.IALOAD));
+    }
+
+    public void array_store(Type type) {
+        mv.visitInsn(type.getOpcode(Constants.IASTORE));
+    }
 
     /**
      * Casts from one primitive numeric type to another
@@ -291,7 +353,7 @@ public class CodeEmitter extends LocalVariablesSorter {
             mv.visitLdcInsn(new Integer(i));
         }
     }
-    
+
     public void push(long value) {
         if (value == 0L || value == 1L) {
             mv.visitInsn(TypeUtils.LCONST(value));
@@ -299,7 +361,7 @@ public class CodeEmitter extends LocalVariablesSorter {
             mv.visitLdcInsn(new Long(value));
         }
     }
-    
+
     public void push(float value) {
         if (value == 0f || value == 1f || value == 2f) {
             mv.visitInsn(TypeUtils.FCONST(value));
@@ -307,6 +369,7 @@ public class CodeEmitter extends LocalVariablesSorter {
             mv.visitLdcInsn(new Float(value));
         }
     }
+
     public void push(double value) {
         if (value == 0d || value == 1d) {
             mv.visitInsn(TypeUtils.DCONST(value));
@@ -314,7 +377,7 @@ public class CodeEmitter extends LocalVariablesSorter {
             mv.visitLdcInsn(new Double(value));
         }
     }
-    
+
     public void push(String value) {
         mv.visitLdcInsn(value);
     }
@@ -330,18 +393,18 @@ public class CodeEmitter extends LocalVariablesSorter {
             emit_type(Constants.ANEWARRAY, type);
         }
     }
-    
+
     public void arraylength() {
         mv.visitInsn(Constants.ARRAYLENGTH);
     }
-    
+
     public void load_this() {
         if (TypeUtils.isStatic(state.access)) {
             throw new IllegalStateException("no 'this' pointer within static method");
         }
         mv.visitVarInsn(Constants.ALOAD, 0);
     }
-    
+
     /**
      * Pushes all of the arguments of the current method onto the stack.
      */
@@ -351,11 +414,12 @@ public class CodeEmitter extends LocalVariablesSorter {
 
     /**
      * Pushes the specified argument of the current method onto the stack.
+     *
      * @param index the zero-based index into the argument list
      */
     public void load_arg(int index) {
         load_local(state.argumentTypes[index],
-                   state.localOffset + skipArgs(index));
+                state.localOffset + skipArgs(index));
     }
 
     // zero-based (see load_this)
@@ -367,7 +431,7 @@ public class CodeEmitter extends LocalVariablesSorter {
             pos += t.getSize();
         }
     }
-    
+
     private int skipArgs(int numArgs) {
         int amount = 0;
         for (int i = 0; i < numArgs; i++) {
@@ -385,15 +449,15 @@ public class CodeEmitter extends LocalVariablesSorter {
         // TODO: make t == null ok?
         mv.visitVarInsn(t.getOpcode(Constants.ISTORE), pos);
     }
-    
+
     public void iinc(Local local, int amount) {
         mv.visitIincInsn(local.getIndex(), amount);
     }
-    
+
     public void store_local(Local local) {
         store_local(local.getType(), local.getIndex());
     }
-    
+
     public void load_local(Local local) {
         load_local(local.getType(), local.getIndex());
     }
@@ -407,7 +471,7 @@ public class CodeEmitter extends LocalVariablesSorter {
         int opcode = TypeUtils.isStatic(info.access) ? Constants.GETSTATIC : Constants.GETFIELD;
         emit_field(opcode, ce.getClassType(), name, info.type);
     }
-    
+
     public void putfield(String name) {
         ClassEmitter.FieldInfo info = ce.getFieldInfo(name);
         int opcode = TypeUtils.isStatic(info.access) ? Constants.PUTSTATIC : Constants.PUTFIELD;
@@ -417,7 +481,7 @@ public class CodeEmitter extends LocalVariablesSorter {
     public void super_getfield(String name, Type type) {
         emit_field(Constants.GETFIELD, ce.getSuperType(), name, type);
     }
-    
+
     public void super_putfield(String name, Type type) {
         emit_field(Constants.PUTFIELD, ce.getSuperType(), name, type);
     }
@@ -425,7 +489,7 @@ public class CodeEmitter extends LocalVariablesSorter {
     public void super_getstatic(String name, Type type) {
         emit_field(Constants.GETSTATIC, ce.getSuperType(), name, type);
     }
-    
+
     public void super_putstatic(String name, Type type) {
         emit_field(Constants.PUTSTATIC, ce.getSuperType(), name, type);
     }
@@ -433,7 +497,7 @@ public class CodeEmitter extends LocalVariablesSorter {
     public void getfield(Type owner, String name, Type type) {
         emit_field(Constants.GETFIELD, owner, name, type);
     }
-    
+
     public void putfield(Type owner, String name, Type type) {
         emit_field(Constants.PUTFIELD, owner, name, type);
     }
@@ -441,7 +505,7 @@ public class CodeEmitter extends LocalVariablesSorter {
     public void getstatic(Type owner, String name, Type type) {
         emit_field(Constants.GETSTATIC, owner, name, type);
     }
-    
+
     public void putstatic(Type owner, String name, Type type) {
         emit_field(Constants.PUTSTATIC, owner, name, type);
     }
@@ -449,9 +513,9 @@ public class CodeEmitter extends LocalVariablesSorter {
     // package-protected for EmitUtils, try to fix
     void emit_field(int opcode, Type ctype, String name, Type ftype) {
         mv.visitFieldInsn(opcode,
-                          ctype.getInternalName(),
-                          name,
-                          ftype.getDescriptor());
+                ctype.getInternalName(),
+                name,
+                ftype.getDescriptor());
     }
 
     public void super_invoke() {
@@ -469,24 +533,24 @@ public class CodeEmitter extends LocalVariablesSorter {
     public void super_invoke_constructor() {
         invoke_constructor(ce.getSuperType());
     }
-    
+
     public void invoke_constructor_this() {
         invoke_constructor(ce.getClassType());
     }
 
     private void emit_invoke(int opcode, Type type, Signature sig) {
         if (sig.getName().equals(Constants.CONSTRUCTOR_NAME) &&
-            ((opcode == Constants.INVOKEVIRTUAL) ||
-             (opcode == Constants.INVOKESTATIC))) {
+                ((opcode == Constants.INVOKEVIRTUAL) ||
+                        (opcode == Constants.INVOKESTATIC))) {
             // TODO: error
         }
         mv.visitMethodInsn(opcode,
-                           type.getInternalName(),
-                           sig.getName(),
-                           sig.getDescriptor(),
-                           opcode == Opcodes.INVOKEINTERFACE);
+                type.getInternalName(),
+                sig.getName(),
+                sig.getDescriptor(),
+                opcode == Opcodes.INVOKEINTERFACE);
     }
-    
+
     public void invoke_interface(Type owner, Signature sig) {
         emit_invoke(Constants.INVOKEINTERFACE, owner, sig);
     }
@@ -518,7 +582,7 @@ public class CodeEmitter extends LocalVariablesSorter {
     public void super_invoke_constructor(Signature sig) {
         invoke_constructor(ce.getSuperType(), sig);
     }
-    
+
     public void new_instance_this() {
         new_instance(ce.getClassType());
     }
@@ -542,18 +606,26 @@ public class CodeEmitter extends LocalVariablesSorter {
         aaload();
     }
 
-    public void aaload() { mv.visitInsn(Constants.AALOAD); }
-    public void aastore() { mv.visitInsn(Constants.AASTORE); }
-    public void athrow() { mv.visitInsn(Constants.ATHROW); }
+    public void aaload() {
+        mv.visitInsn(Constants.AALOAD);
+    }
+
+    public void aastore() {
+        mv.visitInsn(Constants.AASTORE);
+    }
+
+    public void athrow() {
+        mv.visitInsn(Constants.ATHROW);
+    }
 
     public Label make_label() {
         return new Label();
     }
-    
+
     public Local make_local() {
         return make_local(Constants.TYPE_OBJECT);
     }
-    
+
     public Local make_local(Type type) {
         return new Local(newLocal(type.getSize()), type);
     }
@@ -561,7 +633,7 @@ public class CodeEmitter extends LocalVariablesSorter {
     public void checkcast_this() {
         checkcast(ce.getClassType());
     }
-    
+
     public void checkcast(Type type) {
         if (!type.equals(Constants.TYPE_OBJECT)) {
             emit_type(Constants.CHECKCAST, type);
@@ -571,7 +643,7 @@ public class CodeEmitter extends LocalVariablesSorter {
     public void instance_of(Type type) {
         emit_type(Constants.INSTANCEOF, type);
     }
-    
+
     public void instance_of_this() {
         instance_of(ce.getClassType());
     }
@@ -581,7 +653,7 @@ public class CodeEmitter extends LocalVariablesSorter {
         if (keys.length == 0) {
             density = 0;
         } else {
-            density = (float)keys.length / (keys[keys.length - 1] - keys[0] + 1);
+            density = (float) keys.length / (keys[keys.length - 1] - keys[0] + 1);
         }
         process_switch(keys, callback, density >= 0.5f);
     }
@@ -682,6 +754,7 @@ public class CodeEmitter extends LocalVariablesSorter {
      * on the top of the stack with the wrapped (Object) equivalent. For
      * example, char -> Character.
      * If the class is Void, a null is pushed onto the stack instead.
+     *
      * @param type the class indicating the current type of the top stack value
      */
     public void box(Type type) {
@@ -701,15 +774,16 @@ public class CodeEmitter extends LocalVariablesSorter {
                     dup_x1();
                     swap();
                 }
-                invoke_constructor(boxed, new Signature(Constants.CONSTRUCTOR_NAME, Type.VOID_TYPE, new Type[]{ type }));
+                invoke_constructor(boxed, new Signature(Constants.CONSTRUCTOR_NAME, Type.VOID_TYPE, new Type[]{type}));
             }
         }
     }
-    
+
     /**
      * If the argument is a primitive class, replaces the object
      * on the top of the stack with the unwrapped (primitive)
      * equivalent. For example, Character -> char.
+     *
      * @param type the class indicating the desired type of the top stack value
      * @return true if the value was unboxed
      */
@@ -717,29 +791,29 @@ public class CodeEmitter extends LocalVariablesSorter {
         Type t = Constants.TYPE_NUMBER;
         Signature sig = null;
         switch (type.getSort()) {
-        case Type.VOID:
-            return;
-        case Type.CHAR:
-            t = Constants.TYPE_CHARACTER;
-            sig = CHAR_VALUE;
-            break;
-        case Type.BOOLEAN:
-            t = Constants.TYPE_BOOLEAN;
-            sig = BOOLEAN_VALUE;
-            break;
-        case Type.DOUBLE:
-            sig = DOUBLE_VALUE;
-            break;
-        case Type.FLOAT:
-            sig = FLOAT_VALUE;
-            break;
-        case Type.LONG:
-            sig = LONG_VALUE;
-            break;
-        case Type.INT:
-        case Type.SHORT:
-        case Type.BYTE:
-            sig = INT_VALUE;
+            case Type.VOID:
+                return;
+            case Type.CHAR:
+                t = Constants.TYPE_CHARACTER;
+                sig = CHAR_VALUE;
+                break;
+            case Type.BOOLEAN:
+                t = Constants.TYPE_BOOLEAN;
+                sig = BOOLEAN_VALUE;
+                break;
+            case Type.DOUBLE:
+                sig = DOUBLE_VALUE;
+                break;
+            case Type.FLOAT:
+                sig = FLOAT_VALUE;
+                break;
+            case Type.LONG:
+                sig = LONG_VALUE;
+                break;
+            case Type.INT:
+            case Type.SHORT:
+            case Type.BYTE:
+                sig = INT_VALUE;
         }
 
         if (sig == null) {
@@ -778,19 +852,19 @@ public class CodeEmitter extends LocalVariablesSorter {
     public void zero_or_null(Type type) {
         if (TypeUtils.isPrimitive(type)) {
             switch (type.getSort()) {
-            case Type.DOUBLE:
-                push(0d);
-                break;
-            case Type.LONG:
-                push(0L);
-                break;
-            case Type.FLOAT:
-                push(0f);
-                break;
-            case Type.VOID:
-                aconst_null();
-            default:
-                push(0);
+                case Type.DOUBLE:
+                    push(0d);
+                    break;
+                case Type.LONG:
+                    push(0L);
+                    break;
+                case Type.FLOAT:
+                    push(0f);
+                    break;
+                case Type.VOID:
+                    aconst_null();
+                default:
+                    push(0);
             }
         } else {
             aconst_null();

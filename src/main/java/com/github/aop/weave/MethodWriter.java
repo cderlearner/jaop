@@ -2,12 +2,12 @@ package com.github.aop.weave;
 
 import com.github.aop.filter.Filter;
 import com.github.aop.listener.EventListenerHandlers;
-import com.github.aop.log.LoggerFactory;
+import com.github.aop.util.log.LoggerFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
 import com.github.aop.util.AopUtils;
-import com.github.aop.log.api.*;
+import com.github.aop.util.log.api.*;
 
 public class MethodWriter extends ClassVisitor implements Opcodes {
 
@@ -52,133 +52,133 @@ public class MethodWriter extends ClassVisitor implements Opcodes {
             return mv;
         }
 
-        EventListenerHandlers.getSingleton().setClassMethodToListenerId(targetClassInternalName+name+desc, listenerId);
+        EventListenerHandlers.getSingleton().setClassMethodToListenerId(targetClassInternalName + name + desc, listenerId);
         logger.debug("{}.{} was matched, prepare to rewrite, listener-id={}", targetClassAsmType, name, listenerId);
 
 
         return new AdviceAdapter(Opcodes.ASM5, mv, access, name, desc) {
 
-                private final Label startCatch = newLabel();
-                private final Label endCatch = newLabel();
+            private final Label startCatch = newLabel();
+            private final Label endCatch = newLabel();
 
-                /**
-                 * 将NULL压入栈
-                 */
-                final protected void pushNull() {
-                    push((Type) null);
+            /**
+             * 将NULL压入栈
+             */
+            final protected void pushNull() {
+                push((Type) null);
+            }
+
+            /**
+             * 是否静态方法
+             *
+             * @return true:静态方法 / false:非静态方法
+             */
+            final protected boolean isStaticMethod() {
+                return (methodAccess & ACC_STATIC) != 0;
+            }
+
+
+            /**
+             * 加载this/null
+             */
+            final protected void loadThisOrPushNullIfIsStatic() {
+                if (isStaticMethod()) {
+                    pushNull();
+                } else {
+                    loadThis();
                 }
+            }
 
-                /**
-                 * 是否静态方法
-                 *
-                 * @return true:静态方法 / false:非静态方法
-                 */
-                final protected boolean isStaticMethod() {
-                    return (methodAccess & ACC_STATIC) != 0;
-                }
+            /**
+             * 加载异常
+             */
+            private void loadThrow() {
+                dup();
+            }
 
+            /**
+             * 是否抛出异常返回(通过字节码判断)
+             *
+             * @param opcode 操作码
+             * @return true:以抛异常形式返回 / false:非抛异常形式返回(return)
+             */
+            private boolean isThrow(int opcode) {
+                return opcode == ATHROW;
+            }
 
-                /**
-                 * 加载this/null
-                 */
-                final protected void loadThisOrPushNullIfIsStatic() {
-                    if (isStaticMethod()) {
+            /**
+             * 加载返回值
+             * @param opcode 操作吗
+             */
+            private void loadReturn(int opcode) {
+                switch (opcode) {
+
+                    case RETURN: {
                         pushNull();
-                    } else {
-                        loadThis();
+                        break;
                     }
-                }
 
-                /**
-                 * 加载异常
-                 */
-                private void loadThrow() {
-                    dup();
-                }
-
-                /**
-                 * 是否抛出异常返回(通过字节码判断)
-                 *
-                 * @param opcode 操作码
-                 * @return true:以抛异常形式返回 / false:非抛异常形式返回(return)
-                 */
-                private boolean isThrow(int opcode) {
-                    return opcode == ATHROW;
-                }
-
-                /**
-                 * 加载返回值
-                 * @param opcode 操作吗
-                 */
-                private void loadReturn(int opcode) {
-                    switch (opcode) {
-
-                        case RETURN: {
-                            pushNull();
-                            break;
-                        }
-
-                        case ARETURN: {
-                            dup();
-                            break;
-                        }
-
-                        case LRETURN:
-                        case DRETURN: {
-                            dup2();
-                            box(Type.getReturnType(methodDesc));
-                            break;
-                        }
-
-                        default: {
-                            dup();
-                            box(Type.getReturnType(methodDesc));
-                            break;
-                        }
-
+                    case ARETURN: {
+                        dup();
+                        break;
                     }
+
+                    case LRETURN:
+                    case DRETURN: {
+                        dup2();
+                        box(Type.getReturnType(methodDesc));
+                        break;
+                    }
+
+                    default: {
+                        dup();
+                        box(Type.getReturnType(methodDesc));
+                        break;
+                    }
+
                 }
+            }
 
-                @Override
-                protected void onMethodEnter() {
+            @Override
+            protected void onMethodEnter() {
 
-                    //mark(startCatch);
+                //mark(startCatch);
 
-                    loadArgArray();
+                loadArgArray();
 
+                push(listenerId);
+                push(targetJavaClassName);
+                push(name);
+                push(desc);
+                loadThisOrPushNullIfIsStatic();
+
+                invokeStatic(TYPE_SPY, AsmMethods.ASM_METHOD_Spy$spyMethodOnBefore);
+            }
+
+            @Override
+            protected void onMethodExit(int opcode) {
+                if (!isThrow(opcode)) {
+                    loadReturn(opcode);
                     push(listenerId);
-                    push(targetJavaClassName);
-                    push(name);
-                    push(desc);
-                    loadThisOrPushNullIfIsStatic();
-
-                    invokeStatic(TYPE_SPY, AsmMethods.ASM_METHOD_Spy$spyMethodOnBefore);
+                    invokeStatic(TYPE_SPY, AsmMethods.ASM_METHOD_Spy$spyMethodOnReturn);
                 }
+            }
 
-                @Override
-                protected void onMethodExit(int opcode) {
-                    if(!isThrow(opcode)) {
-                        loadReturn(opcode);
-                        push(listenerId);
-                        invokeStatic(TYPE_SPY, AsmMethods.ASM_METHOD_Spy$spyMethodOnReturn);
-                    }
-                }
+            @Override
+            public void visitMaxs(int maxStack, int maxLocals) {
 
-                @Override
-                public void visitMaxs(int maxStack, int maxLocals) {
-
-                    //mark(endCatch);
-                    //visitTryCatchBlock(startCatch, endCatch, mark(), TYPE_THROWABLE.getInternalName());
+                //mark(endCatch);
+                //visitTryCatchBlock(startCatch, endCatch, mark(), TYPE_THROWABLE.getInternalName());
 
 //                    loadThrow();
 //                    push(listenerId);
 //                    invokeStatic(TYPE_SPY, AsmMethods.ASM_METHOD_Spy$spyMethodOnThrows);
 
-                    //throwException();
+                //throwException();
 
-                    super.visitMaxs(maxStack, maxLocals);
-                }
-            };
+                super.visitMaxs(maxStack, maxLocals);
+            }
+        };
     }
 
     /**
