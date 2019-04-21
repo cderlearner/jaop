@@ -1,5 +1,5 @@
 # jaop
-一个类似cglib的aop框架
+写着玩的小工具，稍微修改了cglib的源码，实现aop切面的功能
 
 # 代码示例
 public class Computer {
